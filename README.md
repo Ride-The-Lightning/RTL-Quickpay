@@ -5,7 +5,8 @@ RTL-Quickpay is a chrome browser extension, to make lightning payments quickly v
 [RTL](https://github.com/ShahanaFarooqui/RTL) running on your local network and connected to LND or C-lightning node.
 
 ### Install
-Chrome Webstore link
+Chrome Webstore link:
+
 https://chrome.google.com/webstore/detail/rtl-quick-pay/bnlpaipkkgfdojfdlmakgjngbiepghof
 
 ### Configure
