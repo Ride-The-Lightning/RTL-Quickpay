@@ -1,0 +1,20 @@
+{
+  "manifest_version": 2,
+  "name": "RTL Quickpay",
+  "description": "RTL Quick Lightning payments.",
+  "version": "0.0.1",
+  "author": "Sauby",
+  "icons": {
+    "128": "./images/Helmet128.png",
+    "48": "./images/Helmet48.png",
+    "16": "./images/Helmet16.png"
+  },  
+  "browser_action": {
+    "default_icon": "./images/Helmet16.png",
+    "default_title": "RTL Quickpay",
+    "default_popup": "./quickpay/quickpay.html"
+  },
+  "permissions": [
+    "storage"
+  ]
+}
