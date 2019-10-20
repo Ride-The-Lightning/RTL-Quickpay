@@ -12,3 +12,4 @@ https://chrome.google.com/webstore/detail/rtl-quick-pay/bnlpaipkkgfdojfdlmakgjng
 ### Configure
 To use RTL-Quickpay, just enter the RTL server URL on the extension and the password configured for RTL.
 The server URL will be saved for re-use and can be updated as required.
+If you are running multiple nodes via RTL, the extension will list all the nodes. You can select the node you want to make the payment from.
