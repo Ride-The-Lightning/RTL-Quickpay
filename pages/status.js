@@ -3,7 +3,7 @@ var statusHtml = `
     <h6 id="paymentStatusTitle" class="card-title mt-2">Payment Status:</h6>
     <div class="p-2 mt-2" id="paymentStatusMsg"></div>
     <div class="d-flex justify-content-start mt-2">
-      <button id="closeBtn" type="submit" class="btn btn-outline-primary" tabindex="9">Done</button>
+      <button id="closeBtn" type="submit" class="btn btn-outline-primary" tabindex="12">Done</button>
     </div>
   </div>
 `;

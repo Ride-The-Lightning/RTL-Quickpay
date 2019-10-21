@@ -1,15 +1,15 @@
 authenticationHtml = `
   <div id="authentication" class="page-container">
     <h6 class="card-title mt-2">RTL Server URL:</h6>
-    <input type="text" class="form-control" id="serverUrl" placeholder="Configure server URL to start quick pay" tabindex="1">
+    <input type="text" class="form-control" id="serverUrl" placeholder="Configure server URL to start quick pay" tabindex="3">
     <p id="configError" class="show-error">Please enter complete url including the protocol (http Or https).</p>
     <p id="configMsg" class="show-config-msg">Server URL configured successfully.</p>
     <div class="d-flex justify-content-start mt-2">
-      <button id="configBtn" type="button" class="btn btn-outline-secondary" tabindex="2" disabled>Save URL</button>
+      <button id="configBtn" type="button" class="btn btn-outline-secondary" tabindex="4" disabled>Save URL</button>
     </div><h6 class="card-title mt-2">Password:</h6>
-    <input type="password" class="form-control" id="password" placeholder="Password" tabindex="3">
+    <input type="password" class="form-control" id="password" placeholder="Password" tabindex="5">
     <div class="d-flex justify-content-start mt-2">
-      <button id="authBtn" type="button" class="btn btn-outline-primary" tabindex="4" disabled>Login</button>
+      <button id="authBtn" type="button" class="btn btn-outline-primary" tabindex="6" disabled>Login</button>
     </div>
   </div>`;
 
@@ -38,7 +38,7 @@ Authentication.prototype.initEvents = function () {
     event.preventDefault();
     var surl = $('#serverUrl').val();
     if (surl && surl != '') {
-      if (!CONSTANTS.REGEX.test(surl)) {
+      if (!CONSTANTS.URL_REGEX.test(surl)) {
         $('#configError').show('slow');
       } else {
         $('#configError').hide('slow');

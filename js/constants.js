@@ -7,7 +7,8 @@ var pageContainer = $('#pageContainer');
 class CONSTANTS {
   static get SPINNER() { return '<div class="text-center mt-5"><div id="loadingImage" class="spinner-grow text-primary" role="status"></div><br><span id="spinnerMessage">Fetching Payment...</span></div>'; }
   static get SPINNER_BTN() { return '<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span><span id="spinnerBtnMsg">Sending Payment...</span>'; }
-  static get REGEX() { return /^https?:\/\/\w+(\.\w+)*(:[0-9]+)?\/?(\/[.\w]*)*$/; }
+  static get NUMBER_REGEX() { return /^[+]?\d+$/; }
+  static get URL_REGEX() { return /^https?:\/\/\w+(\.\w+)*(:[0-9]+)?\/?(\/[.\w]*)*$/; }
   static get AUTH_URL() { return '/rtl/api/authenticate'; }
   static get RTL_CONF_URL() { return '/rtl/api/conf/rtlconf'; }
   static get UPDATE_SEL_NODE_URL() { return '/rtl/api/conf/updateSelNode'; }

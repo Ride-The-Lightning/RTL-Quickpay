@@ -1,13 +1,13 @@
 var paymentHtml = `
   <div id="payment" class="page-container">
     <h6>Select Node:</h6>
-    <select class="form-control" id="selectNode" tabindex="5"></select>
+    <select class="form-control" id="selectNode" tabindex="7"></select>
     <h6 class="card-title mt-2">Invoice:</h6>
-      <textarea type="text" class="form-control" id="invoice" placeholder="Invoice" rows="5" tabindex="6"></textarea>
+      <textarea type="text" class="form-control" id="invoice" placeholder="Invoice" rows="5" tabindex="8"></textarea>
     <div class="form-control mt-2 pay-details" id="paymentDetails"></div>
     <div class="d-flex justify-content-start mt-2">
-      <button id="sendPaymentBtn" type="submit" class="btn btn-outline-primary mr-2" tabindex="7" disabled>Pay</button>
-      <button id="clearPaymentBtn" type="reset" class="btn btn-outline-secondary" tabindex="8">Clear</button>
+      <button id="sendPaymentBtn" type="submit" class="btn btn-outline-primary mr-2" tabindex="10" disabled>Pay</button>
+      <button id="clearPaymentBtn" type="reset" class="btn btn-outline-secondary" tabindex="11">Clear</button>
     </div>
   </div>`;
 
@@ -15,6 +15,8 @@ let Payment = function () {};
 
 Payment.prototype.initEvents = function () {
   "use strict";
+  var self = this;
+  var decodedPaymentResponse = {};
   onPageLoad();
 
   function onPageLoad() {
@@ -33,12 +35,28 @@ Payment.prototype.initEvents = function () {
     $('#sendPaymentBtn').html(CONSTANTS.SPINNER_BTN);
     let reqData = {};
     let invoiceVal = $('#invoice').val();
+    let invoiceAmount = $('#invoiceAmount').val();
     let final_url = '';
     if (selectNodeImplementation != 'LND') {
-      reqData = { 'invoice': invoiceVal };
+      if (!self.decodedPaymentResponse.msatoshi && invoiceAmount && invoiceAmount > 0) {
+        reqData = { invoice: invoiceVal, amount: invoiceAmount };
+      } else {
+        reqData = { invoice: invoiceVal };
+      }
       final_url = RTLServerURL + CONSTANTS.API_URL.CL.SEND_PAYMENT;
     } else {
-      reqData = { 'paymentReq': invoiceVal };
+      if (!self.decodedPaymentResponse.num_satoshis && invoiceAmount && invoiceAmount > 0) {
+        let temp = {
+          num_satoshis: invoiceAmount,
+          payment_hash: self.decodedPaymentResponse.payment_hash,
+          cltv_expiry: self.decodedPaymentResponse.cltv_expiry,
+          destination: self.decodedPaymentResponse.destination
+        }
+        reqData = {'paymentDecoded': temp };
+        console.warn(reqData);
+      } else {
+        reqData = { paymentReq: invoiceVal };
+      }
       final_url = RTLServerURL + CONSTANTS.API_URL.LND.SEND_PAYMENT;
     }
     callServerAPI('POST', final_url, serverToken, reqData)
@@ -95,9 +113,18 @@ Payment.prototype.initEvents = function () {
       }
       callServerAPI('GET', final_url, serverToken)
       .then(paymentDetailsResponse => {
-        $('#paymentDetails').html(createPaymentDetailsHTML('SUCCESS', selectNodeImplementation, paymentDetailsResponse));
+        self.decodedPaymentResponse = paymentDetailsResponse;
         $('#paymentDetails').removeClass('invalid-border');
-        $('#sendPaymentBtn').removeAttr('disabled');
+        $('#paymentDetails').html(createPaymentDetailsHTML('SUCCESS', selectNodeImplementation, paymentDetailsResponse));
+        if (
+          (selectNodeImplementation == 'LND' && !paymentDetailsResponse.num_satoshis) || 
+          (selectNodeImplementation != 'LND' && !paymentDetailsResponse.msatoshi)
+        ) {
+          $('#invoiceAmount').focus();
+          $('#sendPaymentBtn').attr('disabled', true);
+        } else {
+          $('#sendPaymentBtn').removeAttr('disabled');
+        }
       }).catch(err => {
         $('#paymentDetails').html(createPaymentDetailsHTML('ERROR', selectNodeImplementation, err.responseJSON));
         $('#paymentDetails').addClass('invalid-border');
@@ -111,6 +138,15 @@ Payment.prototype.initEvents = function () {
     $('#paymentDetails').html('');
     $('#paymentDetails').removeClass('invalid-border');
     $('#sendPaymentBtn').attr('disabled', true);
+  });
+
+  $("#paymentDetails").on("keyup", "#invoiceAmount", function(event){
+    let invoiceAmt = $('#invoiceAmount').val();
+    if (invoiceAmt && invoiceAmt > 0 && CONSTANTS.NUMBER_REGEX.test(invoiceAmt)) {
+      $('#sendPaymentBtn').removeAttr('disabled');
+    } else {
+      $('#sendPaymentBtn').attr('disabled', true);
+    }
   });
 
   pageContainer.keyup(function(event) {
@@ -147,28 +183,34 @@ Payment.prototype.initEvents = function () {
   }
   
   function createPaymentDetailsHTML(status, selectNodeImplementation, paymentDetailsResponse) {
+    var details_html = '';
     if (status == 'SUCCESS') {
       if (selectNodeImplementation == 'LND' && paymentDetailsResponse.destination) {
-        return '<div class="row"><div class="col-3"><p>Destination: </p></div><div class="col-9"><p>'
+        details_html = '<div class="row"><div class="col-3"><p>Destination: </p></div><div class="col-9"><p>'
           + paymentDetailsResponse.destination +
           '</p></div></div><hr><div class="row"><div class="col-3"><p>Description: </p></div><div class="col-9"><p>'
           + paymentDetailsResponse.description +
-          '</p></div></div><hr><div class="row"><div class="col-3"><p>Amount: </p></div><div class="col-9"><p>'
-          + paymentDetailsResponse.num_satoshis +
-          ' Sats</p></div></div><hr><div class="row"><div class="col-3"><p>Expiry: </p></div><div class="col-9"><p>'
-          + paymentDetailsResponse.timestamp_str +
-          '</p></div></div>';
+          '</p></div></div><hr><div class="row"><div class="col-3"><p>Amount: </p></div><div class="col-9"><p class="row col-12 my-0">';
+        if (paymentDetailsResponse.num_satoshis) {
+          details_html = details_html + paymentDetailsResponse.num_satoshis;
+        } else {
+          details_html = details_html + '<input type="text" class="form-control col-6 invoice-amount mb-2" id="invoiceAmount" placeholder="Invoice amount" tabindex="9">';
+        }
+        details_html = details_html + '<span class="col-6"> Sats</span></p></div></div><hr><div class="row"><div class="col-3"><p>Expiry: </p></div><div class="col-9"><p>' + paymentDetailsResponse.timestamp_str + '</p></div></div>';
       } else if (selectNodeImplementation != 'LND' && paymentDetailsResponse.payee) {
-        return '<div class="row"><div class="col-3"><p>Destination: </p></div><div class="col-9"><p>'
-          + paymentDetailsResponse.payee +
-          '</p></div></div><hr><div class="row"><div class="col-3"><p>Description: </p></div><div class="col-9"><p>'
-          + paymentDetailsResponse.description +
-          '</p></div></div><hr><div class="row"><div class="col-3"><p>Amount: </p></div><div class="col-9"><p>'
-          + parseInt(paymentDetailsResponse.msatoshi / 1000) +
-          ' Sats</p></div></div><hr><div class="row"><div class="col-3"><p>Expiry: </p></div><div class="col-9"><p>'
-          + paymentDetailsResponse.expire_at_str +
-          '</p></div></div>';
+        details_html = '<div class="row"><div class="col-3"><p>Destination: </p></div><div class="col-9"><p>'
+        + paymentDetailsResponse.payee +
+        '</p></div></div><hr><div class="row"><div class="col-3"><p>Description: </p></div><div class="col-9"><p>'
+        + paymentDetailsResponse.description +
+        '</p></div></div><hr><div class="row"><div class="col-3"><p>Amount: </p></div><div class="col-9"><p class="row col-12 my-0">';
+        if (paymentDetailsResponse.msatoshi) {
+          details_html = details_html + parseInt(paymentDetailsResponse.msatoshi / 1000);
+        } else {
+          details_html = details_html + '<input type="text" class="form-control col-6 invoice-amount mb-2" id="invoiceAmount" placeholder="Invoice amount" tabindex="9">';
+        }
+        details_html = details_html + '<span class="col-6"> Sats</span></p></div></div><hr><div class="row"><div class="col-3"><p>Expiry: </p></div><div class="col-9"><p>' + paymentDetailsResponse.expire_at_str + '</p></div></div>'; 
       }
+      return details_html;
     } else {
       if (selectNodeImplementation != 'LND') {
         return '<div class="row"><div class="col-3"><p>Error: </p></div><div class="col-9"><p>'

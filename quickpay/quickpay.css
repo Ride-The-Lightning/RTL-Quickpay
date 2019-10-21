@@ -50,6 +50,10 @@ color: #13B955;
   width: 1.6rem;
   height: 1.6rem;
 }
+.invoice-amount {
+  padding: 0 0.75rem;
+  margin-top: -8px;
+}
 :root {
 --blue: #007bff;
 --indigo: #6610f2;
