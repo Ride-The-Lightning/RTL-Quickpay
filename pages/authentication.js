@@ -25,14 +25,17 @@ Authentication.prototype.initEvents = function () {
       if (storage.RTL_SERVER_URL && storage.RTL_SERVER_URL.trim() != '') {
         RTLServerURL = storage.RTL_SERVER_URL;
         $('#serverUrl').val(RTLServerURL);
+        $('#password').focus();
       } else {
         $('#authBtn').attr('disabled', true);
         $('#password').attr('disabled', true);
+        $('#serverUrl').focus();
       }
     });
   }
 
   $('#serverUrl').keyup(function () {
+    event.preventDefault();
     var surl = $('#serverUrl').val();
     if (surl && surl != '') {
       if (!CONSTANTS.REGEX.test(surl)) {
@@ -43,6 +46,9 @@ Authentication.prototype.initEvents = function () {
       }
     } else {
       $('#configBtn').attr('disabled', true);
+    }
+    if(event.code == 'Enter') {
+      $('#configBtn').click();
     }
   });
 
@@ -55,15 +61,18 @@ Authentication.prototype.initEvents = function () {
       RTLServerURL = surl;
       $('#serverUrl').val(surl);
       $('#configMsg').show('slow');
-      $('#authBtn').removeAttr('disabled');
       $('#password').removeAttr('disabled');
       setTimeout(() => { $('#configMsg').hide('slow'); }, 2000);
     });
   });
 
   $('#password').keyup(function () {
+    event.preventDefault();
     if (!event.altKey && !event.ctrlKey && event.code != 'Tab' && $('#password').val().trim() != '') {
       $('#authBtn').removeAttr('disabled');
+      if(event.code == 'Enter') {
+        $('#authBtn').click();
+      }
     }
   });
 
@@ -91,5 +100,5 @@ Authentication.prototype.initEvents = function () {
 };
 
 Authentication.prototype.render = function () {
-  $('#pageContainer').html(authenticationHtml);
+  pageContainer.html(authenticationHtml);
 };

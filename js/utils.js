@@ -31,6 +31,7 @@ function loadModule(moduleName, params) {
     default:
       break;
   }
+  pageContainer.focus();
   newModule.render();
   newModule.initEvents();
 }

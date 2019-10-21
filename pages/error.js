@@ -5,7 +5,7 @@ var errorHtml = `
       <span id="errorMsg">Unable to connect to the server. Please ensure that, server url and password are correct.</span>
     </div>
     <div class="d-flex justify-content-start mt-2">
-      <button id="backBtn" type="button" class="btn btn-outline-secondary" tabindex="0">Back</button>                                
+      <button id="backBtn" type="submit" class="btn btn-outline-secondary" tabindex="0">Back</button>                                
     </div>
   </div>
 `;
@@ -34,6 +34,13 @@ Error.prototype.initEvents = function () {
     }
   }
 
+  pageContainer.keyup(function(event) {
+    event.preventDefault();
+    if(event.code == 'Enter') {
+      $('#backBtn').click();
+    }
+  });
+
   $('#backBtn').click(function () {
     loadModule(self.lastLoaded);
   });
@@ -41,5 +48,5 @@ Error.prototype.initEvents = function () {
 };
 
 Error.prototype.render = function () {
-  $('#pageContainer').html(errorHtml);
+  pageContainer.html(errorHtml);
 };

@@ -1,13 +1,13 @@
 var paymentHtml = `
   <div id="payment" class="page-container">
-  <h6>Select Node:</h6>
-  <select class="form-control" id="selectNode" tabindex="5"></select>
-  <h6 class="card-title mt-2">Invoice:</h6>
-    <textarea type="text" class="form-control" id="invoice" placeholder="Invoice" rows="5" tabindex="6"></textarea>
-  <div class="form-control mt-2 pay-details" id="paymentDetails"></div>
-  <div class="d-flex justify-content-start mt-2">
-    <button id="sendPaymentBtn" type="button" class="btn btn-outline-primary mr-2" tabindex="7" disabled>Pay</button>
-      <button id="clearPaymentBtn" type="button" class="btn btn-outline-secondary" tabindex="8">Clear</button>
+    <h6>Select Node:</h6>
+    <select class="form-control" id="selectNode" tabindex="5"></select>
+    <h6 class="card-title mt-2">Invoice:</h6>
+      <textarea type="text" class="form-control" id="invoice" placeholder="Invoice" rows="5" tabindex="6"></textarea>
+    <div class="form-control mt-2 pay-details" id="paymentDetails"></div>
+    <div class="d-flex justify-content-start mt-2">
+      <button id="sendPaymentBtn" type="submit" class="btn btn-outline-primary mr-2" tabindex="7" disabled>Pay</button>
+      <button id="clearPaymentBtn" type="reset" class="btn btn-outline-secondary" tabindex="8">Clear</button>
     </div>
   </div>`;
 
@@ -22,6 +22,7 @@ Payment.prototype.initEvents = function () {
     .then(rtlConfigRes => {
       rtlConfig = rtlConfigRes;
       addNodeOptionsInSelect(rtlConfig);
+      $('#invoice').focus();
     })
     .catch(err => {
       loadModule('Error', [err.responseJSON, 'Payment']);
@@ -110,6 +111,13 @@ Payment.prototype.initEvents = function () {
     $('#paymentDetails').html('');
     $('#paymentDetails').removeClass('invalid-border');
     $('#sendPaymentBtn').attr('disabled', true);
+  });
+
+  pageContainer.keyup(function(event) {
+    event.preventDefault();
+    if(event.code == 'Enter' && !($('#sendPaymentBtn').is(':disabled'))) {
+      $('#sendPaymentBtn').click();
+    }
   });
 
   function addNodeOptionsInSelect(rtlConfig) {
@@ -233,5 +241,5 @@ Payment.prototype.initEvents = function () {
 };
 
 Payment.prototype.render = function () {
-  $('#pageContainer').html(paymentHtml);
+  pageContainer.html(paymentHtml);
 };

@@ -2,6 +2,7 @@ var RTLServerURL = '';
 var serverToken = 'SHAHANA';
 var rtlConfig = {};
 var selectNodeImplementation = 'LND';
+var pageContainer = $('#pageContainer');
 
 class CONSTANTS {
   static get SPINNER() { return '<div class="text-center mt-5"><div id="loadingImage" class="spinner-grow text-primary" role="status"></div><br><span id="spinnerMessage">Fetching Payment...</span></div>'; }
