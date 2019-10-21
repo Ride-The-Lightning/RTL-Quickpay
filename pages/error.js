@@ -21,14 +21,16 @@ Error.prototype.initEvents = function () {
   onPageLoad();
 
   function onPageLoad() {
-    if(self.errorData.error) {
-      if (typeof self.errorData.error != 'string') {
-        self.errorData.error = JSON.stringify(self.errorData.error, null, 2);
+    if (self.errorData) {
+      if(self.errorData.error) {
+        if (typeof self.errorData.error != 'string') {
+          self.errorData.error = JSON.stringify(self.errorData.error, null, 2);
+        }
+        $('#errorMsg').text(self.errorData.error);
       }
-      $('#errorMsg').text(self.errorData.error);
-    }
-    if(self.errorData.message) {
-      $('#errorTitle').text(self.errorData.message);
+      if(self.errorData.message) {
+        $('#errorTitle').text(self.errorData.message);
+      }
     }
   }
 
