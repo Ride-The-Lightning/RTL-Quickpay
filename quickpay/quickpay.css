@@ -3,8 +3,8 @@
   height: 540px;
   position: relative;
 }
-.tabcontent {
-display: none;
+.page-container {
+display: block;
 padding: 6px 12px;
 height: 100%;
 }
@@ -30,10 +30,12 @@ padding: 0 !important;
 min-width: 1rem !important;
 }
 .show-error {
+  display: none;
 font-size: 0.8rem;
 color: #FC3939;
 }
 .show-config-msg {
+display: none;
 font-size: 0.8rem;
 color: #13B955;
 }

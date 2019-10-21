@@ -2,8 +2,6 @@
 <html>
   <head>
     <title>RTL Quick Pay</title>
-    <script type="text/javascript" src="../js/jquery-3.4.1.min.js"></script>
-    <script type="text/javascript" src="../js/sha256.js"></script>
     <link rel="stylesheet" type="text/css" href="quickpay.css">
   </head>
   <body>
@@ -13,58 +11,23 @@
           <div class="card border-primary mr-1px h-100">
             <div class="row card-header">
               <div class="col-11 header-title">
-                  <img src="../images/RTL-Helmet_Trans.svg" alt="RTL Logo" class="header-logo">
-                  RTL Quick Pay (Alpha)
+                <img src="../images/RTL-Helmet_Trans.svg" alt="RTL Logo" class="header-logo"> RTL Quick Pay (Alpha)
               </div>
               <div id="headerClose" class="col-1 btn btn-header-close" tabindex="0">X</div>
-            </div>
-            <div class="card-body">
-              <div id="errorContent" class="tabcontent">
-                <div id="errorMsg" class="alert alert-danger" role="alert">
-                  <strong><h6>Server Connection Failed!</h6></strong>
-                  <span>Unable to connect to the server. Please ensure that, server url and password are correct.</span>
-                </div>
-                <div class="d-flex justify-content-start mt-2">
-                  <button id="backBtn" type="button" class="btn btn-outline-secondary" tabindex="0">Back</button>                                
-                </div>
-              </div>
-              <div id="authenticationContent" class="tabcontent">
-                <h6 class="card-title mt-2">RTL Server URL:</h6>
-                <input type="text" class="form-control" id="serverUrl" placeholder="Configure server URL to start quick pay" tabindex="1">
-                <p id="configError" class="show-error">Please enter complete url including the protocol (http Or https).</p>
-                <p id="configMsg" class="show-config-msg">Server URL configured successfully.</p>
-                <div class="d-flex justify-content-start mt-2">
-                  <button id="configBtn" type="button" class="btn btn-outline-secondary" tabindex="2" disabled>Save URL</button>
-                </div>
-                <h6 class="card-title mt-2">Password:</h6>
-                <input type="password" class="form-control" id="password" placeholder="Password" tabindex="3">
-                <div class="d-flex justify-content-start mt-2">
-                  <button id="authBtn" type="button" class="btn btn-outline-primary" tabindex="4" disabled>Login</button>
-                </div>
-              </div>
-              <div id="paymentContent" class="tabcontent">
-                <h6>Select Node:</h6>
-                <select class="form-control" id="selectNode" tabindex="5"><options></options></select>
-                <h6 class="card-title mt-2">Invoice:</h6>
-                <textarea type="text" class="form-control" id="invoice" placeholder="Invoice" rows="5" tabindex="6"></textarea>
-                <div class="form-control mt-2 pay-details" id="paymentDetails"></div>
-                <div class="d-flex justify-content-start mt-2">
-                  <button id="sendPaymentBtn" type="button" class="btn btn-outline-primary mr-2" tabindex="7" disabled>Pay</button>
-                  <button id="clearPaymentBtn" type="button" class="btn btn-outline-secondary" tabindex="8">Clear</button>
-                </div>
-              </div>
-              <div id="statusContent" class="tabcontent">
-                <h6 id="paymentStatusTitle" class="card-title mt-2">Payment Status:</h6>
-                <div class="p-2 mt-2" id="paymentStatusMsg"></div>
-                <div class="d-flex justify-content-start mt-2">
-                  <button id="closeBtn" type="button" class="btn btn-outline-primary" tabindex="9">Done</button>
-                </div>
-              </div>
-            </div>
+            </div>              
+            <div class="card-body" id="pageContainer"></div>
           </div>          
         </div>
       </div>      
     </div>
-    <script src="quickpay.js"></script>
+    <script type="text/javascript" src="../js/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="../js/sha256.js"></script>
+    <script type="text/javascript" src="../js/constants.js"></script>
+    <script type="text/javascript" src="../js/utils.js"></script>
+    <script type="text/javascript" src="../pages/error.js"></script>
+    <script type="text/javascript" src="../pages/authentication.js"></script>
+    <script type="text/javascript" src="../pages/payment.js"></script>
+    <script type="text/javascript" src="../pages/status.js"></script>
+    <script type="text/javascript" src="quickpay.js"></script>
   </body>
 </html>
