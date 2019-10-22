@@ -39,23 +39,18 @@ Payment.prototype.initEvents = function () {
     let final_url = '';
     if (selectNodeImplementation != 'LND') {
       if (!self.decodedPaymentResponse.msatoshi && invoiceAmount && invoiceAmount > 0) {
-        reqData = { invoice: invoiceVal, amount: invoiceAmount };
+        reqData = { "invoice": invoiceVal, "amount": parseInt(invoiceAmount*1000) };
       } else {
-        reqData = { invoice: invoiceVal };
+        reqData = { "invoice": invoiceVal };
       }
       final_url = RTLServerURL + CONSTANTS.API_URL.CL.SEND_PAYMENT;
     } else {
       if (!self.decodedPaymentResponse.num_satoshis && invoiceAmount && invoiceAmount > 0) {
-        let temp = {
-          num_satoshis: invoiceAmount,
-          payment_hash: self.decodedPaymentResponse.payment_hash,
-          cltv_expiry: self.decodedPaymentResponse.cltv_expiry,
-          destination: self.decodedPaymentResponse.destination
-        }
-        reqData = {'paymentDecoded': temp };
-        console.warn(reqData);
+        let temp = {paymentDecoded: self.decodedPaymentResponse};
+        temp.paymentDecoded.num_satoshis = invoiceAmount;
+        reqData = JSON.stringify(temp);
       } else {
-        reqData = { paymentReq: invoiceVal };
+        reqData = { "paymentReq": invoiceVal };
       }
       final_url = RTLServerURL + CONSTANTS.API_URL.LND.SEND_PAYMENT;
     }
@@ -235,6 +230,10 @@ Payment.prototype.initEvents = function () {
   function createPaymentStatusHTML(status, selectNodeImplementation, paymentStatusResponse) {
     if (status == 'SUCCESS') {
       if (selectNodeImplementation != 'LND') {
+        let fee = 0;
+        if (paymentStatusResponse.msatoshi_sent && paymentStatusResponse.msatoshi) {
+          fee = paymentStatusResponse.msatoshi_sent - paymentStatusResponse.msatoshi;
+        }
         return '<div class="row"><div class="col-3"><p>Preimage: </p></div><div class="col-9"><p>'
           + paymentStatusResponse.payment_preimage +
           '</p></div></div><hr><div class="row"><div class="col-3"><p>Payment hash: </p></div><div class="col-9"><p>'
@@ -242,11 +241,14 @@ Payment.prototype.initEvents = function () {
           '</p></div></div><hr><div class="row"><div class="col-3"><p>Amount paid: </p></div><div class="col-9"><p>'
           + parseInt(paymentStatusResponse.msatoshi_sent / 1000) +
           ' Sats</p></div></div><hr><div class="row"><div class="col-3"><p>Total fee: </p></div><div class="col-9"><p>'
-          + (paymentStatusResponse.msatoshi_sent - paymentStatusResponse.msatoshi) +
+          + fee +
           ' mSats</p></div></div><hr><div class="row"><div class="col-3"><p>Status: </p></div><div class="col-9"><p>'
           + paymentStatusResponse.status +
           '</p></div></div><hr>';
       } else {
+        if (!paymentStatusResponse.payment_route.total_fees_msat) {
+          paymentStatusResponse.payment_route.total_fees_msat = 0;
+        }
         return '<div class="row"><div class="col-3"><p>Preimage: </p></div><div class="col-9"><p>'
           + paymentStatusResponse.payment_preimage +
           '</p></div></div><hr><div class="row"><div class="col-3"><p>Payment hash: </p></div><div class="col-9"><p>'
