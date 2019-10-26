@@ -27,7 +27,10 @@ Status.prototype.initEvents = function () {
     }
   }
 
-  $('#closeBtn').click(function () { close(); });
+  $('#closeBtn').click(function () { 
+    close();
+    window.top.close();
+  });
 
   pageContainer.keyup(function(event) {
     event.preventDefault();

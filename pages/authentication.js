@@ -13,8 +13,7 @@ authenticationHtml = `
     </div>
   </div>`;
 
-let Authentication = function () {
-};
+let Authentication = function () {};
 
 Authentication.prototype.initEvents = function () {
   "use strict";
@@ -81,7 +80,7 @@ Authentication.prototype.initEvents = function () {
     $('#spinnerBtnMsg').text('Logging in...');
     var shaObj = new jsSHA($('#password').val(), 'ASCII');
     var hashedPassword = shaObj.getHash('SHA-256', 'HEX');
-    callServerAPI('POST', RTLServerURL + CONSTANTS.AUTH_URL, '', { 'authenticateWith': 'PASSWORD', 'authenticationValue': hashedPassword })
+    callServerAPI('POST', RTLServerURL + CONSTANTS.AUTH_URL, '', JSON.stringify({ 'authenticateWith': 'PASSWORD', 'authenticationValue': hashedPassword }))
     .then(tokenObjFromAPI => {
       if (tokenObjFromAPI.token) {
         serverToken = tokenObjFromAPI.token;

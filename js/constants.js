@@ -1,9 +1,3 @@
-var RTLServerURL = '';
-var serverToken = 'SHAHANA';
-var rtlConfig = {};
-var selectNodeImplementation = 'LND';
-var pageContainer = $('#pageContainer');
-
 class CONSTANTS {
   static get SPINNER() { return '<div class="text-center mt-5"><div id="loadingImage" class="spinner-grow text-primary" role="status"></div><br><span id="spinnerMessage">Fetching Payment...</span></div>'; }
   static get SPINNER_BTN() { return '<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span><span id="spinnerBtnMsg">Sending Payment...</span>'; }
@@ -26,4 +20,19 @@ class CONSTANTS {
       }
     };
   };
+  static get OPENED_FROM_SOURCE() {
+    return {
+      EXTENSION: 'EXTENSION',
+      CLICK: 'CLICK',
+      CONTEXT: 'CONTEXT'
+    };
+  };
 }
+
+var RTLServerURL = '';
+var serverToken = '';
+var rtlConfig = {};
+var selectNodeImplementation = 'LND';
+var pageContainer = $('#pageContainer');
+var invoiceToPay = '';
+var openingSource = CONSTANTS.OPENED_FROM_SOURCE.EXTENSION;

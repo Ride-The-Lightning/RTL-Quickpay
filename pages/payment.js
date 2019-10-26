@@ -24,7 +24,6 @@ Payment.prototype.initEvents = function () {
     .then(rtlConfigRes => {
       rtlConfig = rtlConfigRes;
       addNodeOptionsInSelect(rtlConfig);
-      $('#invoice').focus();
     })
     .catch(err => {
       loadModule('Error', [err.responseJSON, 'Payment']);
@@ -46,15 +45,14 @@ Payment.prototype.initEvents = function () {
       final_url = RTLServerURL + CONSTANTS.API_URL.CL.SEND_PAYMENT;
     } else {
       if (!self.decodedPaymentResponse.num_satoshis && invoiceAmount && invoiceAmount > 0) {
-        let temp = {paymentDecoded: self.decodedPaymentResponse};
-        temp.paymentDecoded.num_satoshis = invoiceAmount;
-        reqData = JSON.stringify(temp);
+        reqData = {paymentDecoded: self.decodedPaymentResponse};
+        reqData.paymentDecoded.num_satoshis = invoiceAmount;
       } else {
         reqData = { "paymentReq": invoiceVal };
       }
       final_url = RTLServerURL + CONSTANTS.API_URL.LND.SEND_PAYMENT;
     }
-    callServerAPI('POST', final_url, serverToken, reqData)
+    callServerAPI('POST', final_url, serverToken, JSON.stringify(reqData))
     .then(data => {
       loadModule('Status', { status: 'SUCCESS', title: 'Payment successful:', message: createPaymentStatusHTML('SUCCESS', selectNodeImplementation, data) });
       $('#sendPaymentBtn').html('Pay');
@@ -74,7 +72,7 @@ Payment.prototype.initEvents = function () {
       var newSelNode = $('#selectNode').val();
       var filteredNode = rtlConfig.nodes.filter(node => { return node.index == newSelNode; })[0];
       selectNodeImplementation = (filteredNode.lnImplementation && filteredNode.lnImplementation != '') ? filteredNode.lnImplementation.toUpperCase() : 'LND';
-      callServerAPI('POST', RTLServerURL + CONSTANTS.UPDATE_SEL_NODE_URL, serverToken, { 'selNodeIndex': newSelNode })
+      callServerAPI('POST', RTLServerURL + CONSTANTS.UPDATE_SEL_NODE_URL, serverToken, JSON.stringify({ 'selNodeIndex': newSelNode }))
       .then(selNodeResponse => {
         let final_url = '';
         if (selectNodeImplementation != 'LND') {
@@ -84,7 +82,15 @@ Payment.prototype.initEvents = function () {
         }
         callServerAPI('GET', final_url, serverToken)
           .then(getInfoResponse => {
-            $('#paymentDetails').html('');
+            if(invoiceToPay.trim() !== '') {
+              $('#invoice').val(invoiceToPay);
+              $('#invoice').focus();
+              var e = $.Event('keyup');
+              e.keyCode = 13;
+              $('#invoice').trigger(e);
+            } else {
+              $('#paymentDetails').html('');
+            }
           })
           .catch(err => {
             loadModule('Error', [err.responseJSON, 'Payment']);
@@ -97,7 +103,7 @@ Payment.prototype.initEvents = function () {
   });
   
   $('#invoice').keyup(function (event) {
-    var invoiceVal = $('#invoice').val();
+    var invoiceVal = $('#invoice').val().trim();
     if (!event.altKey && !event.ctrlKey && event.code != 'Tab' && invoiceVal.trim() != '') {
       $('#paymentDetails').html(CONSTANTS.SPINNER);
       let final_url = '';
@@ -191,7 +197,7 @@ Payment.prototype.initEvents = function () {
         } else {
           details_html = details_html + '<input type="text" class="form-control col-6 invoice-amount mb-2" id="invoiceAmount" placeholder="Invoice amount" tabindex="9">';
         }
-        details_html = details_html + '<span class="col-6"> Sats</span></p></div></div><hr><div class="row"><div class="col-3"><p>Expiry: </p></div><div class="col-9"><p>' + paymentDetailsResponse.timestamp_str + '</p></div></div>';
+        details_html = details_html + '<span class="col-6 pl-1"> Sats</span></p></div></div><hr><div class="row"><div class="col-3"><p>Expiry: </p></div><div class="col-9"><p>' + paymentDetailsResponse.timestamp_str + '</p></div></div>';
       } else if (selectNodeImplementation != 'LND' && paymentDetailsResponse.payee) {
         details_html = '<div class="row"><div class="col-3"><p>Destination: </p></div><div class="col-9"><p>'
         + paymentDetailsResponse.payee +
@@ -203,7 +209,7 @@ Payment.prototype.initEvents = function () {
         } else {
           details_html = details_html + '<input type="text" class="form-control col-6 invoice-amount mb-2" id="invoiceAmount" placeholder="Invoice amount" tabindex="9">';
         }
-        details_html = details_html + '<span class="col-6"> Sats</span></p></div></div><hr><div class="row"><div class="col-3"><p>Expiry: </p></div><div class="col-9"><p>' + paymentDetailsResponse.expire_at_str + '</p></div></div>'; 
+        details_html = details_html + '<span class="col-6 pl-1"> Sats</span></p></div></div><hr><div class="row"><div class="col-3"><p>Expiry: </p></div><div class="col-9"><p>' + paymentDetailsResponse.expire_at_str + '</p></div></div>'; 
       }
       return details_html;
     } else {
