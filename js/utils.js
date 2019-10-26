@@ -9,22 +9,22 @@ function callServerAPI(method, url, serverToken, requestData) {
   });  
 }
 
-function loadModule(moduleName, params) {
+function loadModule(params) {
   let newModule = {};
-  switch (moduleName.toUpperCase()) {
-    case 'AUTHENTICATION':
-      newModule = new Authentication();
+  switch (params.load) {
+    case CONSTANTS.MODULES.AUTHENTICATION:
+      newModule = new Authentication(params);
       break
 
-    case 'PAYMENT':
-      newModule = new Payment();
+    case CONSTANTS.MODULES.PAYMENT:
+      newModule = new Payment(params);
       break
 
-    case 'ERROR':
+    case CONSTANTS.MODULES.ERROR:
       newModule = new Error(params);
       break
 
-    case 'STATUS':
+    case CONSTANTS.MODULES.STATUS:
       newModule = new Status(params);
       break
 

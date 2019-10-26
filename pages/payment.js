@@ -11,7 +11,9 @@ var paymentHtml = `
     </div>
   </div>`;
 
-let Payment = function () {};
+let Payment = function (params) {
+  this.loadedFrom = params.loadedFrom;
+};
 
 Payment.prototype.initEvents = function () {
   "use strict";
@@ -24,9 +26,15 @@ Payment.prototype.initEvents = function () {
     .then(rtlConfigRes => {
       rtlConfig = rtlConfigRes;
       addNodeOptionsInSelect(rtlConfig);
+      if (self.loadedFrom !== 'ERROR') {
+        $('#selectNode').val(rtlConfig.selectedNodeIndex).trigger('change'); //Do Not Remove: It sets request options from get_info
+      } else {
+        $('#invoice').val('Either fix the connection for selected node or select another node to pay');
+        $('#invoice').attr('disabled', true);
+      }
     })
     .catch(err => {
-      loadModule('Error', [err.responseJSON, 'Payment']);
+      loadModule({ load: CONSTANTS.MODULES.ERROR, loadedFrom: CONSTANTS.MODULES.PAYMENT, error: err.responseJSON});
     });
   }
 
@@ -54,11 +62,11 @@ Payment.prototype.initEvents = function () {
     }
     callServerAPI('POST', final_url, serverToken, JSON.stringify(reqData))
     .then(data => {
-      loadModule('Status', { status: 'SUCCESS', title: 'Payment successful:', message: createPaymentStatusHTML('SUCCESS', selectNodeImplementation, data) });
+      loadModule({ load: CONSTANTS.MODULES.STATUS, loadedFrom: CONSTANTS.MODULES.PAYMENT, status: 'SUCCESS', title: 'Payment successful:', message: createPaymentStatusHTML('SUCCESS', selectNodeImplementation, data)});
       $('#sendPaymentBtn').html('Pay');
     })
     .catch(err => {
-      loadModule('Status', { status: 'ERROR', title: 'Payment failed:', message: createPaymentStatusHTML('ERROR', selectNodeImplementation, err.responseJSON) });
+      loadModule({ load: CONSTANTS.MODULES.STATUS, loadedFrom: CONSTANTS.MODULES.PAYMENT, status: 'ERROR', title: 'Payment failed:', message: createPaymentStatusHTML('ERROR', selectNodeImplementation, err.responseJSON)});
       $('#sendPaymentBtn').html('Pay');
     });
   });
@@ -93,11 +101,11 @@ Payment.prototype.initEvents = function () {
             }
           })
           .catch(err => {
-            loadModule('Error', [err.responseJSON, 'Payment']);
+            loadModule({ load: CONSTANTS.MODULES.ERROR, loadedFrom: CONSTANTS.MODULES.PAYMENT, error: err.responseJSON});
           });
       })
       .catch(err => {
-        loadModule('Error', [err.responseJSON, 'Payment']);
+        loadModule({ load: CONSTANTS.MODULES.ERROR, loadedFrom: CONSTANTS.MODULES.PAYMENT, error: err.responseJSON});
       });
     }
   });
@@ -179,7 +187,6 @@ Payment.prototype.initEvents = function () {
           }
         }
       }
-      selectNode.val(rtlConfig.selectedNodeIndex).trigger('change'); //Do Not Remove: It sets request options from get_info
     }
   }
   

@@ -11,8 +11,8 @@ var errorHtml = `
 `;
 
 let Error = function (params) {
-  this.errorData = params[0];
-  this.lastLoaded = params[1];
+  this.errorData = params.error;
+  this.loadedFrom = params.loadedFrom;
 };
 
 Error.prototype.initEvents = function () {
@@ -42,7 +42,7 @@ Error.prototype.initEvents = function () {
   });
 
   $('#backBtn').click(function () {
-    loadModule(self.lastLoaded);
+    loadModule({ load: self.loadedFrom, loadedFrom: CONSTANTS.MODULES.ERROR });
   });
 
 };

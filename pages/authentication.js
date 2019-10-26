@@ -13,14 +13,17 @@ authenticationHtml = `
     </div>
   </div>`;
 
-let Authentication = function () {};
+let Authentication = function (params) {
+  this.loadedFrom = params.loadedFrom;
+};
 
 Authentication.prototype.initEvents = function () {
   "use strict";
+  var browser = (function() { return window.msBrowser || window.browser || window.chrome })();
   onPageLoad();
 
   function onPageLoad() {
-    chrome.storage.sync.get('RTL_SERVER_URL', function (storage) {
+    browser.storage.sync.get('RTL_SERVER_URL', function (storage) {
       if (storage.RTL_SERVER_URL && storage.RTL_SERVER_URL.trim() != '') {
         RTLServerURL = storage.RTL_SERVER_URL;
         $('#serverUrl').val(RTLServerURL);
@@ -56,7 +59,7 @@ Authentication.prototype.initEvents = function () {
     if (surl.lastIndexOf('/') == (surl.length - 1)) { surl = surl.slice(0, surl.length - 1); }
     if (surl.lastIndexOf('/api') == (surl.length - 4)) { surl = surl.slice(0, surl.length - 4); }
     if (surl.lastIndexOf('/rtl') == (surl.length - 4)) { surl = surl.slice(0, surl.length - 4); }
-    chrome.storage.sync.set({ 'RTL_SERVER_URL': surl }, function (storage) {
+    browser.storage.sync.set({ 'RTL_SERVER_URL': surl }, function (storage) {
       RTLServerURL = surl;
       $('#serverUrl').val(surl);
       $('#configMsg').show('slow');
@@ -84,16 +87,16 @@ Authentication.prototype.initEvents = function () {
     .then(tokenObjFromAPI => {
       if (tokenObjFromAPI.token) {
         serverToken = tokenObjFromAPI.token;
-        loadModule('Payment');
+        loadModule({ load: CONSTANTS.MODULES.PAYMENT, loadedFrom: CONSTANTS.MODULES.AUTHENTICATION });
       } else {
         let err = {message: 'Server Connection or Authentication Failed!', error: 'Unable to connect to the server. Please ensure that, server url and password are correct.'};
-        loadModule('Error', [err, 'Authentication']);
+        loadModule({ load: CONSTANTS.MODULES.ERROR, loadedFrom: CONSTANTS.MODULES.AUTHENTICATION, error: err });
       }
       $('#authBtn').html('Login');
     })
     .catch(err => {
       $('#authBtn').html('Login');
-      loadModule('Error', [err.responseJSON, 'Authentication']);
+      loadModule({ load: CONSTANTS.MODULES.ERROR, loadedFrom: CONSTANTS.MODULES.AUTHENTICATION, error: err.responseJSON });
     });
   });
 };

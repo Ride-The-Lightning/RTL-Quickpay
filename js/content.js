@@ -7,7 +7,7 @@ if (document) {
       if (paymentURL) {
         const href = paymentURL.getAttribute('href');
         const payReq = href.replace('lightning:', '');
-        chrome.runtime.sendMessage({data: payReq, source: 'CLICK', application: 'RTL'});
+        browser.runtime.sendMessage({data: payReq, source: 'CLICK', application: 'RTL'});
         event.preventDefault();
       }
     });
@@ -20,7 +20,7 @@ if (document) {
           payReq = target.innerText || target.value;
         }
         if (payReq) {
-          chrome.runtime.sendMessage({data: payReq, source: 'CONTEXT', application: 'RTL'});
+          browser.runtime.sendMessage({data: payReq, source: 'CONTEXT', application: 'RTL'});
         }
       }
     });

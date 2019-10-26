@@ -27,6 +27,15 @@ class CONSTANTS {
       CONTEXT: 'CONTEXT'
     };
   };
+  static get MODULES() {
+    return {
+      MAIN: 'MAIN',
+      AUTHENTICATION: 'AUTHENTICATION',
+      PAYMENT: 'PAYMENT',
+      ERROR: 'ERROR',
+      STATUS: 'STATUS'
+    };
+  };
 }
 
 var RTLServerURL = '';

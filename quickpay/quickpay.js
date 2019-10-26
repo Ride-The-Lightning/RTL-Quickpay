@@ -7,7 +7,7 @@ $(function () {
       invoiceToPay = (dataFromURL.invoice) ? dataFromURL.invoice : '';
       openingSource = (dataFromURL.source) ? dataFromURL.source : '';
     }
-    loadModule('Authentication');
+    loadModule({ load: CONSTANTS.MODULES.AUTHENTICATION, loadedFrom: CONSTANTS.MODULES.MAIN });
   });
 
   $('#headerClose').click(function () {

@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "RTL Quickpay",
   "description": "RTL Quick Lightning payments.",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "Shahana",
   "icons": {
     "128": "./images/Helmet128.png",
@@ -11,7 +11,7 @@
   }, 
   "background": {
     "persistent": true,
-    "scripts": ["./js/background.js"]
+    "scripts": ["./js/browser-polyfill.js", "./js/background.js"]
   },   
   "browser_action": {
     "default_icon": "./images/Helmet16.png",
@@ -21,7 +21,7 @@
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["./js/content.js"],
+      "js": ["./js/browser-polyfill.js", "./js/content.js"],
       "run_at": "document_start",
       "all_frames": true
     }
@@ -30,5 +30,11 @@
     "storage",
     "activeTab",
     "contextMenus"
-  ]
+  ],
+  "applications": {
+    "gecko": {
+      "id": "shahana@rtl.com",
+      "strict_min_version": "53.0"
+    }
+  }
 }
