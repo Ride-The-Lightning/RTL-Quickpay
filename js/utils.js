@@ -2,9 +2,10 @@
 
 function callServerAPI(method, url, serverToken, requestData) {
   return $.ajax({
+    cache: false,
     url: url,
     headers: { 'Authorization': 'Bearer ' + serverToken, 'Content-Type': 'application/json' },
-    type: method,
+    method: method,
     data: requestData
   });  
 }
