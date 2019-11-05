@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "RTL Quickpay",
   "description": "RTL Quick Lightning payments.",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "author": "Shahana",
   "icons": {
     "128": "./images/Helmet128.png",
@@ -33,8 +33,8 @@
   ],
   "applications": {
     "gecko": {
-      "id": "shahana@rtl.com",
-      "strict_min_version": "53.0"
+      "id": "shahana.farooqui@rtl.com",
+      "strict_min_version": "57.0"
     }
   }
 }
