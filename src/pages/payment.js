@@ -1,13 +1,13 @@
 var paymentHtml = `
   <div id="payment" class="page-container">
     <h6>Select Node:</h6>
-    <select class="form-control" id="selectNode" tabindex="7"></select>
+    <select class="custom-select" id="selectNode" tabindex="7"></select>
     <h6 class="card-title mt-2">Invoice:</h6>
-      <textarea type="text" class="form-control" id="invoice" placeholder="Invoice" rows="5" tabindex="8"></textarea>
+      <textarea type="text" class="form-control" id="invoice" rows="5" tabindex="8"></textarea>
     <div class="form-control mt-2 pay-details" id="paymentDetails"></div>
     <div class="d-flex justify-content-start mt-2">
-      <button id="sendPaymentBtn" type="submit" class="btn btn-outline-primary mr-2" tabindex="10" disabled>Pay</button>
-      <button id="clearPaymentBtn" type="reset" class="btn btn-outline-secondary" tabindex="11">Clear</button>
+      <button id="clearPaymentBtn" type="reset" class="btn btn-outline-primary mr-2" tabindex="10">Clear</button>
+      <button id="sendPaymentBtn" type="submit" class="btn btn-primary" tabindex="11" disabled>Pay</button>
     </div>
   </div>`;
 

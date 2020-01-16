@@ -5,7 +5,7 @@ var errorHtml = `
       <span id="errorMsg">Unable to connect to the server. Please ensure that, server url and password are correct.</span>
     </div>
     <div class="d-flex justify-content-start mt-2">
-      <button id="backBtn" type="submit" class="btn btn-outline-secondary" tabindex="0">Back</button>                                
+      <button id="backBtn" type="submit" class="btn btn-outline-primary" tabindex="0">Back</button>                                
     </div>
   </div>
 `;

@@ -1,0 +1,20 @@
+{
+  "name": "rtl-quick-pay",
+  "version": "0.0.5",
+  "license": "MIT",
+  "scripts": {
+    "build": "rimraf dist && webpack",
+    "postinstall": "copyfiles -f node_modules/jquery/dist/jquery.min.js node_modules/jssha/src/sha256.js node_modules/webextension-polyfill/dist/browser-polyfill.js -u 3 ./src/js"
+  },
+  "private": true,
+  "devDependencies": {
+    "copy-webpack-plugin": "^5.1.1",
+    "copyfiles": "^2.1.1",
+    "jquery": "^3.4.1",
+    "jssha": "^2.3.1",
+    "webextension-polyfill": "^0.6.0",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10",
+    "zip-webpack-plugin": "^3.0.0"
+  }
+}
