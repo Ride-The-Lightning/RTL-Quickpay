@@ -85,18 +85,13 @@ Payment.prototype.initEvents = function () {
       $('#spinnerMessage').text('Fetching Information...')
       $('#invoice').val('');
       $('#paymentDetails').removeClass('invalid-border');
-      var newSelNode = $("input[name='selectNodeRadioInput']:checked").val();
-      var filteredNode = rtlConfig.nodes.filter(node => { return node.index == newSelNode; })[0];
-      selectNodeImplementation = (filteredNode.lnImplementation && filteredNode.lnImplementation != '') ? filteredNode.lnImplementation.toUpperCase() : 'LND';
-      callServerAPI('POST', RTLServerURL + CONSTANTS.UPDATE_SEL_NODE_URL, serverToken, JSON.stringify({ 'selNodeIndex': newSelNode }))
-      .then(selNodeResponse => {
-        updateStyles(newSelNode);
-        let final_url = '';
-        if (selectNodeImplementation != 'LND') {
-          final_url = RTLServerURL + CONSTANTS.API_URL.CL.GET_INFO;
-        } else {
-          final_url = RTLServerURL + CONSTANTS.API_URL.LND.GET_INFO;
-        }
+      var newSelNode = '';
+      var filteredNode = {};
+      var final_url = '';
+      if(rtlConfig.nodes.length == 1) {
+        filteredNode = rtlConfig.nodes[0];
+        selectNodeImplementation = 'LND';
+        final_url = RTLServerURL + CONSTANTS.API_URL.LND.GET_INFO;
         callServerAPI('GET', final_url, serverToken)
           .then(getInfoResponse => {
             if(invoiceToPay.trim() !== '') {
@@ -112,10 +107,38 @@ Payment.prototype.initEvents = function () {
           .catch(err => {
             loadModule({ load: CONSTANTS.MODULES.ERROR, loadedFrom: CONSTANTS.MODULES.PAYMENT, error: err.responseJSON});
           });
-      })
-      .catch(err => {
-        loadModule({ load: CONSTANTS.MODULES.ERROR, loadedFrom: CONSTANTS.MODULES.PAYMENT, error: err.responseJSON});
-      });
+      } else {
+        newSelNode = $("input[name='selectNodeRadioInput']:checked").val();
+        filteredNode = rtlConfig.nodes.filter(node => { return node.index == newSelNode; })[0];
+        selectNodeImplementation = (filteredNode.lnImplementation && filteredNode.lnImplementation != '') ? filteredNode.lnImplementation.toUpperCase() : 'LND';
+        callServerAPI('POST', RTLServerURL + CONSTANTS.UPDATE_SEL_NODE_URL, serverToken, JSON.stringify({ 'selNodeIndex': newSelNode }))
+        .then(selNodeResponse => {
+          updateStyles(newSelNode);
+          if (selectNodeImplementation != 'LND') {
+            final_url = RTLServerURL + CONSTANTS.API_URL.CL.GET_INFO;
+          } else {
+            final_url = RTLServerURL + CONSTANTS.API_URL.LND.GET_INFO;
+          }
+          callServerAPI('GET', final_url, serverToken)
+            .then(getInfoResponse => {
+              if(invoiceToPay.trim() !== '') {
+                $('#invoice').val(invoiceToPay);
+                $('#invoice').focus();
+                var e = $.Event('keyup');
+                e.keyCode = 13;
+                $('#invoice').trigger(e);
+              } else {
+                $('#paymentDetails').html('');
+              }
+            })
+            .catch(err => {
+              loadModule({ load: CONSTANTS.MODULES.ERROR, loadedFrom: CONSTANTS.MODULES.PAYMENT, error: err.responseJSON});
+            });
+        })
+        .catch(err => {
+          loadModule({ load: CONSTANTS.MODULES.ERROR, loadedFrom: CONSTANTS.MODULES.PAYMENT, error: err.responseJSON});
+        });
+      }
     }
   });
 
@@ -124,7 +147,7 @@ Payment.prototype.initEvents = function () {
       if (storage.SERVER_CONFIG && storage.SERVER_CONFIG.nodes) {
         storage.SERVER_CONFIG.selectedNodeIndex = selNodeIndex;
         let selNode = storage.SERVER_CONFIG.nodes.filter(node => node.index == selNodeIndex)[0];
-        if(selNode.settings && selNode.settings.themeMode && selNode.settings.themeColor) {
+        if(selNode && selNode.settings && selNode.settings.themeMode && selNode.settings.themeColor) {
           $('link[id="themeStyle"]').attr('href','./styles/' + selNode.settings.themeMode + '/' + selNode.settings.themeColor + '.css');
         }
       }
