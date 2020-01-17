@@ -16,3 +16,12 @@ Browsers Supported:
 To use RTL-Quickpay, just enter the RTL server URL on the extension and the password configured for RTL.
 The server URL will be saved for re-use and can be updated as required.
 If you are running multiple nodes via RTL, the extension will list all the nodes. You can select the node you want to make the payment from.
+
+### Build Instructions
+* npm install - It will install required dependencies.
+* npm run build - Build script that executes all necessary technical steps. It will bundle at ./dist folder and zip the build as <root>/RTL-Quickpay-v<version>.zip.
+
+### OS & other requirements
+* Windows OS
+* NodeJS version 8 and above
+* npm version 6 and above
