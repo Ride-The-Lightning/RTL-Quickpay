@@ -4,7 +4,7 @@ if (document) {
   browser.runtime.onMessage.addListener((msg, sender) => {
     if (msg.data && msg.source === 'CLICK' && msg.application === 'RTL') {
       browser.windows.create({
-        url: browser.runtime.getURL('../quickpay/quickpay.html') + '?invoice=' + msg.data + '&source=' + msg.source,
+        url: browser.runtime.getURL('../index.html') + '?invoice=' + msg.data + '&source=' + msg.source,
         type: 'popup',
         width: 563,
         height: 585
@@ -23,7 +23,7 @@ if (document) {
       onclick : (info) => {
         if (info.menuItemId === 'rtl-quickpay') {
           browser.windows.create({
-            url: browser.runtime.getURL('../quickpay/quickpay.html') + '?invoice=' + payReqForContext + '&source=CONTEXT',
+            url: browser.runtime.getURL('../index.html') + '?invoice=' + payReqForContext + '&source=CONTEXT',
             type: 'popup',
             width: 563,
             height: 585
