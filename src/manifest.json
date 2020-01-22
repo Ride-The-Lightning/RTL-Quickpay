@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "RTL Quickpay",
   "description": "RTL Quick Lightning payments.",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "author": "Shahana",
   "icons": {
     "128": "./images/Helmet128.png",
