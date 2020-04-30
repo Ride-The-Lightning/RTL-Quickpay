@@ -10,7 +10,7 @@
   "devDependencies": {
     "copy-webpack-plugin": "^5.1.1",
     "copyfiles": "^2.1.1",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "jssha": "^2.3.1",
     "webextension-polyfill": "^0.6.0",
     "webpack": "^4.41.5",
