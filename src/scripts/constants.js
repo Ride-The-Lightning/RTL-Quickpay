@@ -4,7 +4,7 @@ class CONSTANTS {
   static get NUMBER_REGEX() { return /^[+]?\d+$/; }
   static get URL_REGEX() { return /^https?:\/\/\w+(\.\w+)*(:[0-9]+)?\/?(\/[.\w]*)*$/; }
   static get AUTH_URL() { return '/rtl/api/authenticate'; }
-  static get RTL_CONF_URL() { return '/rtl/api/conf/rtlconf'; }
+  static get RTL_CONF_URL() { return '/rtl/api/conf/rtlconfinit'; }
   static get UPDATE_SEL_NODE_URL() { return '/rtl/api/conf/updateSelNode'; }
   static get API_URL() {
     return {
@@ -14,9 +14,9 @@ class CONSTANTS {
         SEND_PAYMENT: '/rtl/api/lnd/channels/transactions'
       },
       CL: {
-        GET_INFO: '/rtl/api/cl/getinfo',
-        GET_PAYMENT_DETAILS: '/rtl/api/cl/payments',
-        SEND_PAYMENT: '/rtl/api/cl/payments'
+        GET_INFO: '/rtl/api/cln/getinfo',
+        GET_PAYMENT_DETAILS: '/rtl/api/cln/payments',
+        SEND_PAYMENT: '/rtl/api/cln/payments'
       }
     };
   };

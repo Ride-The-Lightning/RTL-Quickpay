@@ -58,7 +58,7 @@ Payment.prototype.initEvents = function () {
       } else {
         reqData = { "invoice": invoiceVal };
       }
-      final_url = RTLServerURL + CONSTANTS.API_URL.CL.SEND_PAYMENT;
+      final_url = RTLServerURL + CONSTANTS.API_URL.CLN.SEND_PAYMENT;
     } else {
       if (!self.decodedPaymentResponse.num_satoshis && invoiceAmount && invoiceAmount > 0) {
         reqData = {paymentDecoded: self.decodedPaymentResponse};
@@ -115,7 +115,7 @@ Payment.prototype.initEvents = function () {
         .then(selNodeResponse => {
           updateStyles(newSelNode);
           if (selectNodeImplementation != 'LND') {
-            final_url = RTLServerURL + CONSTANTS.API_URL.CL.GET_INFO;
+            final_url = RTLServerURL + CONSTANTS.API_URL.CLN.GET_INFO;
           } else {
             final_url = RTLServerURL + CONSTANTS.API_URL.LND.GET_INFO;
           }
@@ -160,7 +160,7 @@ Payment.prototype.initEvents = function () {
       $('#paymentDetails').html(CONSTANTS.SPINNER);
       let final_url = '';
       if (selectNodeImplementation != 'LND') {
-        final_url = RTLServerURL + CONSTANTS.API_URL.CL.GET_PAYMENT_DETAILS + '/' + invoiceVal;
+        final_url = RTLServerURL + CONSTANTS.API_URL.CLN.GET_PAYMENT_DETAILS + '/' + invoiceVal;
       } else {
         final_url = RTLServerURL + CONSTANTS.API_URL.LND.GET_PAYMENT_DETAILS + '/' + invoiceVal;
       }
