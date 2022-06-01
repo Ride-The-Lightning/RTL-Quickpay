@@ -13,7 +13,7 @@ class CONSTANTS {
         GET_PAYMENT_DETAILS: '/rtl/api/lnd/payreq',
         SEND_PAYMENT: '/rtl/api/lnd/channels/transactions'
       },
-      CL: {
+      CLN: {
         GET_INFO: '/rtl/api/cln/getinfo',
         GET_PAYMENT_DETAILS: '/rtl/api/cln/payments',
         SEND_PAYMENT: '/rtl/api/cln/payments'
