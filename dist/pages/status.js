@@ -18,6 +18,7 @@ Status.prototype.initEvents = function () {
   onPageLoad();
 
   function onPageLoad() {
+    console.warn(self);
     if (self.statusData && self.statusData.status) {
       if (self.statusData.status == 'ERROR') {
         $('#paymentStatusMsg').addClass('invalid-border');

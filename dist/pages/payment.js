@@ -54,9 +54,9 @@ Payment.prototype.initEvents = function () {
     let final_url = '';
     if (selectNodeImplementation != 'LND') {
       if (!self.decodedPaymentResponse.msatoshi && invoiceAmount && invoiceAmount > 0) {
-        reqData = { "invoice": invoiceVal, "amount": parseInt(invoiceAmount*1000) };
+        reqData = { "paymentType": "INVOICE", "invoice": invoiceVal, "amount": parseInt(invoiceAmount*1000) };
       } else {
-        reqData = { "invoice": invoiceVal };
+        reqData = { "paymentType": "INVOICE", "invoice": invoiceVal };
       }
       final_url = RTLServerURL + CONSTANTS.API_URL.CLN.SEND_PAYMENT;
     } else {
@@ -70,7 +70,7 @@ Payment.prototype.initEvents = function () {
     }
     callServerAPI('POST', final_url, serverToken, JSON.stringify(reqData))
     .then(data => {
-      loadModule({ load: CONSTANTS.MODULES.STATUS, loadedFrom: CONSTANTS.MODULES.PAYMENT, status: 'SUCCESS', title: 'Payment successful:', message: createPaymentStatusHTML('SUCCESS', selectNodeImplementation, data)});
+      loadModule({ load: CONSTANTS.MODULES.STATUS, loadedFrom: CONSTANTS.MODULES.PAYMENT, status: 'SUCCESS', title: 'Payment successful:', message: createPaymentStatusHTML('SUCCESS', selectNodeImplementation, data.paymentResponse)});
       $('#sendPaymentBtn').html('Pay');
     })
     .catch(err => {
@@ -266,7 +266,7 @@ Payment.prototype.initEvents = function () {
         } else {
           details_html = details_html + '<input type="text" class="form-control col-6 invoice-amount mb-2" id="invoiceAmount" placeholder="Invoice amount" tabindex="9">';
         }
-        details_html = details_html + '<span class="col-6 pl-1"> Sats</span></p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Expiry: </p></div><div class="col-9"><p class="my-0">' + paymentDetailsResponse.expire_at_str + '</p></div></div>'; 
+        details_html = details_html + '<span class="col-6 pl-1"> Sats</span></p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Expiry: </p></div><div class="col-9"><p class="my-0">' + paymentDetailsResponse.expiry + '</p></div></div>'; 
       }
       return details_html;
     } else {

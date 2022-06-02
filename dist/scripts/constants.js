@@ -15,7 +15,7 @@ class CONSTANTS {
       },
       CLN: {
         GET_INFO: '/rtl/api/cln/getinfo',
-        GET_PAYMENT_DETAILS: '/rtl/api/cln/payments',
+        GET_PAYMENT_DETAILS: '/rtl/api/cln/utility/decode',
         SEND_PAYMENT: '/rtl/api/cln/payments'
       }
     };
