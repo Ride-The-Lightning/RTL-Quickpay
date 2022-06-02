@@ -6,8 +6,8 @@ if (document) {
       browser.windows.create({
         url: browser.runtime.getURL('../index.html') + '?invoice=' + msg.data + '&source=' + msg.source,
         type: 'popup',
-        width: 563,
-        height: 585
+        width: 564,
+        height: 653
       });
     }
     if (msg.data && msg.source === 'CONTEXT' && msg.application === 'RTL') {
@@ -25,8 +25,8 @@ if (document) {
           browser.windows.create({
             url: browser.runtime.getURL('../index.html') + '?invoice=' + payReqForContext + '&source=CONTEXT',
             type: 'popup',
-            width: 563,
-            height: 585
+            width: 564,
+            height: 653
           });
         }
       }

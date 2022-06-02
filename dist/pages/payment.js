@@ -52,25 +52,36 @@ Payment.prototype.initEvents = function () {
     let invoiceVal = $('#invoice').val();
     let invoiceAmount = $('#invoiceAmount').val();
     let final_url = '';
-    if (selectNodeImplementation != 'LND') {
-      if (!self.decodedPaymentResponse.msatoshi && invoiceAmount && invoiceAmount > 0) {
-        reqData = { "paymentType": "INVOICE", "invoice": invoiceVal, "amount": parseInt(invoiceAmount*1000) };
-      } else {
-        reqData = { "paymentType": "INVOICE", "invoice": invoiceVal };
-      }
-      final_url = RTLServerURL + CONSTANTS.API_URL.CLN.SEND_PAYMENT;
-    } else {
-      if (!self.decodedPaymentResponse.num_satoshis && invoiceAmount && invoiceAmount > 0) {
-        reqData = {paymentDecoded: self.decodedPaymentResponse};
-        reqData.paymentDecoded.num_satoshis = invoiceAmount;
-      } else {
-        reqData = { "paymentReq": invoiceVal };
-      }
-      final_url = RTLServerURL + CONSTANTS.API_URL.LND.SEND_PAYMENT;
+    switch (selectNodeImplementation) {
+      case 'CLN':
+        if (!self.decodedPaymentResponse.msatoshi && invoiceAmount && invoiceAmount > 0) {
+          reqData = { "paymentType": "INVOICE", "invoice": invoiceVal, "amount": parseInt(invoiceAmount*1000) };
+        } else {
+          reqData = { "paymentType": "INVOICE", "invoice": invoiceVal };
+        }
+        final_url = RTLServerURL + CONSTANTS.API_URL.CLN.SEND_PAYMENT;
+        break;
+      case 'ECL':
+        if (!self.decodedPaymentResponse.amount && invoiceAmount && invoiceAmount > 0) {
+          reqData = { "invoice": invoiceVal, "amountMsat": parseInt(invoiceAmount*1000) };
+        } else {
+          reqData = { "invoice": invoiceVal };
+        }
+        final_url = RTLServerURL + CONSTANTS.API_URL.ECL.SEND_PAYMENT;
+        break;
+      default:
+        if (!self.decodedPaymentResponse.num_satoshis && invoiceAmount && invoiceAmount > 0) {
+          reqData = {paymentDecoded: self.decodedPaymentResponse};
+          reqData.paymentDecoded.num_satoshis = invoiceAmount;
+        } else {
+          reqData = { "paymentReq": invoiceVal };
+        }
+        final_url = RTLServerURL + CONSTANTS.API_URL.LND.SEND_PAYMENT;
+        break;
     }
     callServerAPI('POST', final_url, serverToken, JSON.stringify(reqData))
     .then(data => {
-      loadModule({ load: CONSTANTS.MODULES.STATUS, loadedFrom: CONSTANTS.MODULES.PAYMENT, status: 'SUCCESS', title: 'Payment successful:', message: createPaymentStatusHTML('SUCCESS', selectNodeImplementation, data.paymentResponse)});
+      loadModule({ load: CONSTANTS.MODULES.STATUS, loadedFrom: CONSTANTS.MODULES.PAYMENT, status: 'SUCCESS', title: 'Payment status:', message: createPaymentStatusHTML('SUCCESS', selectNodeImplementation, data.paymentResponse ? data.paymentResponse : data)});
       $('#sendPaymentBtn').html('Pay');
     })
     .catch(err => {
@@ -84,14 +95,25 @@ Payment.prototype.initEvents = function () {
       $('#paymentDetails').html(CONSTANTS.SPINNER);
       $('#spinnerMessage').text('Fetching Information...')
       $('#invoice').val('');
+      $('#invoice').attr('disabled', false);
       $('#paymentDetails').removeClass('invalid-border');
       var newSelNodeIndex = -1;
       var filteredNode = {};
       var final_url = '';
       if(rtlConfig.nodes.length == 1) {
         filteredNode = rtlConfig.nodes[0];
-        selectNodeImplementation = 'LND';
-        final_url = RTLServerURL + CONSTANTS.API_URL.LND.GET_INFO;
+        selectNodeImplementation = rtlConfig.nodes[0].lnImplementation ? rtlConfig.nodes[0].lnImplementation : 'LND';
+        switch (selectNodeImplementation) {
+          case 'CLN':
+            final_url = RTLServerURL + CONSTANTS.API_URL.CLN.GET_INFO;
+            break;
+          case 'ECL':
+            final_url = RTLServerURL + CONSTANTS.API_URL.ECL.GET_INFO;
+            break;
+          default:
+            final_url = RTLServerURL + CONSTANTS.API_URL.LND.GET_INFO;
+            break;
+        }
         callServerAPI('GET', final_url, serverToken)
           .then(getInfoResponse => {
             if(invoiceToPay.trim() !== '') {
@@ -115,10 +137,16 @@ Payment.prototype.initEvents = function () {
         .then(selNodeResponse => {
           selNode = rtlConfig.nodes.filter(node => node.index == newSelNodeIndex)[0];
           updateStyles(newSelNodeIndex);
-          if (selectNodeImplementation != 'LND') {
-            final_url = RTLServerURL + CONSTANTS.API_URL.CLN.GET_INFO;
-          } else {
-            final_url = RTLServerURL + CONSTANTS.API_URL.LND.GET_INFO;
+          switch (selectNodeImplementation) {
+            case 'CLN':
+              final_url = RTLServerURL + CONSTANTS.API_URL.CLN.GET_INFO;
+              break;
+            case 'ECL':
+              final_url = RTLServerURL + CONSTANTS.API_URL.ECL.GET_INFO;
+              break;
+            default:
+              final_url = RTLServerURL + CONSTANTS.API_URL.LND.GET_INFO;
+              break;
           }
           callServerAPI('GET', final_url, serverToken)
             .then(getInfoResponse => {
@@ -160,10 +188,16 @@ Payment.prototype.initEvents = function () {
     if (!event.altKey && !event.ctrlKey && event.code != 'Tab' && invoiceVal.trim() != '') {
       $('#paymentDetails').html(CONSTANTS.SPINNER);
       let final_url = '';
-      if (selectNodeImplementation != 'LND') {
-        final_url = RTLServerURL + CONSTANTS.API_URL.CLN.GET_PAYMENT_DETAILS + '/' + invoiceVal;
-      } else {
-        final_url = RTLServerURL + CONSTANTS.API_URL.LND.GET_PAYMENT_DETAILS + '/' + invoiceVal;
+      switch (selectNodeImplementation) {
+        case 'CLN':
+          final_url = RTLServerURL + CONSTANTS.API_URL.CLN.GET_PAYMENT_DETAILS + '/' + invoiceVal;
+          break;
+        case 'ECL':
+          final_url = RTLServerURL + CONSTANTS.API_URL.ECL.GET_PAYMENT_DETAILS + '/' + invoiceVal;
+          break;
+        default:
+          final_url = RTLServerURL + CONSTANTS.API_URL.LND.GET_PAYMENT_DETAILS + '/' + invoiceVal;
+          break;
       }
       callServerAPI('GET', final_url, serverToken)
       .then(paymentDetailsResponse => {
@@ -172,7 +206,8 @@ Payment.prototype.initEvents = function () {
         $('#paymentDetails').html(createPaymentDetailsHTML('SUCCESS', selectNodeImplementation, paymentDetailsResponse));
         if (
           (selectNodeImplementation == 'LND' && !paymentDetailsResponse.num_satoshis) || 
-          (selectNodeImplementation != 'LND' && !paymentDetailsResponse.msatoshi)
+          (selectNodeImplementation == 'CLN' && !paymentDetailsResponse.msatoshi) ||
+          (selectNodeImplementation == 'ECL' && !paymentDetailsResponse.amount)
         ) {
           $('#invoiceAmount').focus();
           $('#sendPaymentBtn').attr('disabled', true);
@@ -214,21 +249,21 @@ Payment.prototype.initEvents = function () {
     var selectNodeRadio = $('#selectNodeRadio');
     var str = '';
     if (rtlConfig.nodes.length) {
-      if (rtlConfig.nodes.length === 1) {
+      if (rtlConfig.nodes.length == 1) {
         str = 
         '<div class="custom-control custom-radio">' + 
           '<input type="radio" class="custom-control-input" name="selectNodeRadioInput" id="selectNodeRadioInput' + rtlConfig.nodes[0].index + '" value="' + rtlConfig.nodes[0].index + '" checked="">' + 
-          '<label class="custom-control-label" for="selectNodeRadioInput' + rtlConfig.nodes[0].index + '">' + (rtlConfig.nodes[0].lnNode && rtlConfig.nodes[0].lnNode.toUpperCase() != 'SINGLENODE') ? rtlConfig.nodes[0].lnNode : 'LN Node' + '</label>' + 
+          '<label class="custom-control-label" for="selectNodeRadioInput' + rtlConfig.nodes[0].index + '">' + rtlConfig.nodes[0].lnNode + '(' + rtlConfig.nodes[0].lnImplementation + ')' + '</label>' + 
         '</div>';
         selectNodeRadio.append(str);
         $("#selectNodeRadioInput" + rtlConfig.nodes[0].index).prop( "checked", true );
-        selectNodeImplementation = 'LND';
+        selectNodeImplementation = rtlConfig.nodes[0].lnImplementation ? rtlConfig.nodes[0].lnImplementation : 'LND';
       } else {
         for (var i = 0; i < rtlConfig.nodes.length; i++) {
           str = 
           '<div class="custom-control custom-radio">' + 
             '<input type="radio" class="custom-control-input" name="selectNodeRadioInput" id="selectNodeRadioInput' + rtlConfig.nodes[i].index + '" value="' + rtlConfig.nodes[i].index + '">' + 
-            '<label class="custom-control-label" for="selectNodeRadioInput' + rtlConfig.nodes[i].index + '">' + rtlConfig.nodes[i].lnNode + '</label>' + 
+            '<label class="custom-control-label" for="selectNodeRadioInput' + rtlConfig.nodes[i].index + '">' + rtlConfig.nodes[i].lnNode + '(' + rtlConfig.nodes[i].lnImplementation + ')' + '</label>' + 
           '</div>';
           selectNodeRadio.append(str);
           if (rtlConfig.nodes[i].index == rtlConfig.selectedNodeIndex) {
@@ -243,43 +278,78 @@ Payment.prototype.initEvents = function () {
   function createPaymentDetailsHTML(status, selectNodeImplementation, paymentDetailsResponse) {
     var details_html = '';
     if (status == 'SUCCESS') {
-      if (selectNodeImplementation == 'LND' && paymentDetailsResponse.destination) {
-        details_html = '<div class="row"><div class="col-3"><p class="my-0">Destination: </p></div><div class="col-9"><p class="my-0">'
-          + paymentDetailsResponse.destination +
-          '</p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Description: </p></div><div class="col-9"><p class="my-0">'
-          + paymentDetailsResponse.description +
-          '</p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Amount: </p></div><div class="col-9"><p class="row col-12 my-0">';
-        if (paymentDetailsResponse.num_satoshis) {
-          details_html = details_html + paymentDetailsResponse.num_satoshis;
-        } else {
-          details_html = details_html + '<input type="text" class="form-control col-6 invoice-amount mb-2" id="invoiceAmount" placeholder="Invoice amount" tabindex="9">';
-        }
-        details_html = details_html + '<span class="col-6 pl-1"> Sats</span></p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Expiry: </p></div><div class="col-9"><p class="my-0">' + paymentDetailsResponse.timestamp_str + '</p></div></div>';
-      } else if (selectNodeImplementation != 'LND' && paymentDetailsResponse.payee) {
-        details_html = '<div class="row"><div class="col-3"><p class="my-0">Destination: </p></div><div class="col-9"><p class="my-0">'
-        + paymentDetailsResponse.payee +
-        '</p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Description: </p></div><div class="col-9"><p class="my-0">'
-        + paymentDetailsResponse.description +
-        '</p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Amount: </p></div><div class="col-9"><p class="row col-12 my-0">';
-        if (paymentDetailsResponse.msatoshi) {
-          details_html = details_html + parseInt(paymentDetailsResponse.msatoshi / 1000);
-        } else {
-          details_html = details_html + '<input type="text" class="form-control col-6 invoice-amount mb-2" id="invoiceAmount" placeholder="Invoice amount" tabindex="9">';
-        }
-        details_html = details_html + '<span class="col-6 pl-1"> Sats</span></p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Expiry: </p></div><div class="col-9"><p class="my-0">' + paymentDetailsResponse.expiry + '</p></div></div>'; 
+      switch (selectNodeImplementation) {
+        case 'CLN':
+          if (paymentDetailsResponse.payee) {
+            var expiryDate = new Date((+paymentDetailsResponse.created_at + +paymentDetailsResponse.expiry) * 1000);
+            var expiryDateStr = ('0' + (expiryDate.getDay())).slice(-2) + '/' + CONSTANTS.MONTHS[expiryDate.getMonth()].name + '/' + expiryDate.getFullYear() + ' ' + expiryDate.getHours() + ':' + expiryDate.getMinutes();
+            details_html = '<div class="row"><div class="col-3"><p class="my-0">Destination: </p></div><div class="col-9"><p class="my-0">'
+            + paymentDetailsResponse.payee +
+            '</p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Description: </p></div><div class="col-9"><p class="my-0">'
+            + paymentDetailsResponse.description +
+            '</p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Amount: </p></div><div class="col-9"><p class="row col-12 my-0">';
+            if (paymentDetailsResponse.msatoshi) {
+              details_html = details_html + formatNumberWithCommas(parseInt(paymentDetailsResponse.msatoshi / 1000));
+            } else {
+              details_html = details_html + '<input type="text" class="form-control col-6 invoice-amount mb-2" id="invoiceAmount" placeholder="Invoice amount" tabindex="9">';
+            }
+            details_html = details_html + '<span class="col-6 pl-1"> Sats</span></p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Expiry: </p></div><div class="col-9"><p class="my-0">' + expiryDateStr + '</p></div></div>'; 
+          }
+          break;
+        case 'ECL':
+          if (paymentDetailsResponse.nodeId) {
+            var expiryDate = new Date((paymentDetailsResponse.timestamp + (paymentDetailsResponse.expiry ? paymentDetailsResponse.expiry : 3600)) * 1000);
+            var expiryDateStr = ('0' + (expiryDate.getDay())).slice(-2) + '/' + CONSTANTS.MONTHS[expiryDate.getMonth()].name + '/' + expiryDate.getFullYear() + ' ' + expiryDate.getHours() + ':' + expiryDate.getMinutes();
+            details_html = '<div class="row"><div class="col-3"><p class="my-0">Destination: </p></div><div class="col-9"><p class="my-0">'
+            + paymentDetailsResponse.nodeId +
+            '</p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Description: </p></div><div class="col-9"><p class="my-0">'
+            + paymentDetailsResponse.description +
+            '</p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Amount: </p></div><div class="col-9"><p class="row col-12 my-0">';
+            if (paymentDetailsResponse.amount) {
+              details_html = details_html + formatNumberWithCommas(parseInt(paymentDetailsResponse.amount));
+            } else {
+              details_html = details_html + '<input type="text" class="form-control col-6 invoice-amount mb-2" id="invoiceAmount" placeholder="Invoice amount" tabindex="9">';
+            }
+            details_html = details_html + '<span class="col-6 pl-1"> Sats</span></p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Expiry: </p></div><div class="col-9"><p class="my-0">' + expiryDateStr + '</p></div></div>'; 
+          }
+          break;
+        default:
+          if (paymentDetailsResponse.destination) {
+            var expiryDate = new Date((+paymentDetailsResponse.timestamp + +paymentDetailsResponse.expiry) * 1000);
+            var expiryDateStr = ('0' + (expiryDate.getDay())).slice(-2) + '/' + CONSTANTS.MONTHS[expiryDate.getMonth()].name + '/' + expiryDate.getFullYear() + ' ' + expiryDate.getHours() + ':' + expiryDate.getMinutes();
+            details_html = '<div class="row"><div class="col-3"><p class="my-0">Destination: </p></div><div class="col-9"><p class="my-0">'
+              + paymentDetailsResponse.destination +
+              '</p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Description: </p></div><div class="col-9"><p class="my-0">'
+              + paymentDetailsResponse.description +
+              '</p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Amount: </p></div><div class="col-9"><p class="row col-12 my-0">';
+            if (paymentDetailsResponse.num_satoshis && +paymentDetailsResponse.num_satoshis > 0) {
+              details_html = details_html + formatNumberWithCommas(+paymentDetailsResponse.num_satoshis);
+            } else {
+              details_html = details_html + '<input type="text" class="form-control col-6 invoice-amount mb-2" id="invoiceAmount" placeholder="Invoice amount" tabindex="9">';
+            }
+            details_html = details_html + '<span class="col-6 pl-1"> Sats</span></p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Expiry: </p></div><div class="col-9"><p class="my-0">' + expiryDateStr  + '</p></div></div>';
+          }    
+          break;
       }
       return details_html;
     } else {
-      if (selectNodeImplementation != 'LND') {
-        return '<div class="row px-2"><div class="col-3"><p class="my-0">Error: </p></div><div class="col-9"><p class="my-0">'
+      switch (selectNodeImplementation) {
+        case 'CLN':
+          return '<div class="row px-2"><div class="col-3"><p class="my-0">Error: </p></div><div class="col-9"><p class="my-0">'
           + paymentDetailsResponse.message +
           '</p></div></div><hr><div class="row px-2"><div class="col-3"><p class="my-0">Code: </p></div><div class="col-9"><p class="my-0">'
           + paymentDetailsResponse.error.error.code +
           '</p></div></div><hr><div class="row px-2"><div class="col-3"><p class="my-0">Description: </p></div><div class="col-9"><p class="my-0">'
           + paymentDetailsResponse.error.error.message +
           '</p></div></div>';
-      } else {
-        return '<div class="row px-2"><div class="col-3"><p class="my-0">Error: </p></div><div class="col-9"><p class="my-0">'
+        case 'ECL':
+          return '<div class="row px-2"><div class="col-3"><p class="my-0">Error: </p></div><div class="col-9"><p class="my-0">'
+          + paymentDetailsResponse.error +
+          '</p></div></div><hr><div class="row px-2"><div class="col-3"><p class="my-0">Description: </p></div><div class="col-9"><p class="my-0">'
+          + paymentDetailsResponse.message +
+          '</p></div></div>';
+        default:
+          return '<div class="row px-2"><div class="col-3"><p class="my-0">Error: </p></div><div class="col-9"><p class="my-0">'
           + paymentDetailsResponse.message +
           '</p></div></div><hr><div class="row px-2"><div class="col-3"><p class="my-0">Code: </p></div><div class="col-9"><p class="my-0">'
           + paymentDetailsResponse.error.code +
@@ -292,49 +362,62 @@ Payment.prototype.initEvents = function () {
   
   function createPaymentStatusHTML(status, selectNodeImplementation, paymentStatusResponse) {
     if (status == 'SUCCESS') {
-      if (selectNodeImplementation != 'LND') {
-        let fee = 0;
-        if (paymentStatusResponse.msatoshi_sent && paymentStatusResponse.msatoshi) {
-          fee = paymentStatusResponse.msatoshi_sent - paymentStatusResponse.msatoshi;
-        }
-        return '<div class="row"><div class="col-3"><p class="my-0">Preimage: </p></div><div class="col-9"><p class="my-0">'
-          + paymentStatusResponse.payment_preimage +
-          '</p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Payment hash: </p></div><div class="col-9"><p class="my-0">'
-          + paymentStatusResponse.payment_hash +
-          '</p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Amount paid: </p></div><div class="col-9"><p class="my-0">'
-          + parseInt(paymentStatusResponse.msatoshi_sent / 1000) +
-          ' Sats</p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Total fee: </p></div><div class="col-9"><p class="my-0">'
-          + fee +
-          ' mSats</p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Status: </p></div><div class="col-9"><p class="my-0">'
-          + paymentStatusResponse.status +
-          '</p></div></div><hr>';
-      } else {
-        if (!paymentStatusResponse.payment_route.total_fees_msat) {
-          paymentStatusResponse.payment_route.total_fees_msat = 0;
-        }
-        return '<div class="row"><div class="col-3"><p class="my-0">Preimage: </p></div><div class="col-9"><p class="my-0">'
-          + paymentStatusResponse.payment_preimage +
-          '</p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Payment hash: </p></div><div class="col-9"><p class="my-0">'
-          + paymentStatusResponse.payment_hash +
-          '</p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Amount paid: </p></div><div class="col-9"><p class="my-0">'
-          + paymentStatusResponse.payment_route.total_amt +
-          ' Sats</p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Total fee: </p></div><div class="col-9"><p class="my-0">'
-          + paymentStatusResponse.payment_route.total_fees_msat +
-          ' mSats</p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Total hops: </p></div><div class="col-9"><p class="my-0">'
-          + paymentStatusResponse.payment_route.hops.length +
-          '</p></div></div><hr>';
+      switch (selectNodeImplementation) {
+        case 'CLN':
+          let fee = 0;
+          if (paymentStatusResponse.msatoshi_sent && paymentStatusResponse.msatoshi) {
+            fee = paymentStatusResponse.msatoshi_sent - paymentStatusResponse.msatoshi;
+          }
+          return '<div class="row"><div class="col-3"><p class="my-0">Preimage: </p></div><div class="col-9"><p class="my-0">'
+            + paymentStatusResponse.payment_preimage +
+            '</p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Payment hash: </p></div><div class="col-9"><p class="my-0">'
+            + paymentStatusResponse.payment_hash +
+            '</p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Amount paid: </p></div><div class="col-9"><p class="my-0">'
+            + formatNumberWithCommas(parseInt(paymentStatusResponse.msatoshi_sent / 1000)) +
+            ' Sats</p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Total fee: </p></div><div class="col-9"><p class="my-0">'
+            + formatNumberWithCommas(+fee) +
+            ' mSats</p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Status: </p></div><div class="col-9"><p class="my-0">'
+            + paymentStatusResponse.status +
+            '</p></div></div><hr>';
+        case 'ECL':
+          return '<div class="row"><div class="col-4"><p class="my-0">Submitted with ID: </p></div><div class="col-8"><p class="my-0">'
+            + paymentStatusResponse +
+            '</p></div></div><hr>';
+        default:
+          if (!paymentStatusResponse.payment_route.total_fees_msat) {
+            paymentStatusResponse.payment_route.total_fees_msat = 0;
+          }
+          return '<div class="row"><div class="col-3"><p class="my-0">Preimage: </p></div><div class="col-9"><p class="my-0">'
+            + paymentStatusResponse.payment_preimage +
+            '</p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Payment hash: </p></div><div class="col-9"><p class="my-0">'
+            + paymentStatusResponse.payment_hash +
+            '</p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Amount paid: </p></div><div class="col-9"><p class="my-0">'
+            + formatNumberWithCommas(paymentStatusResponse.payment_route.total_amt) +
+            ' Sats</p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Total fee: </p></div><div class="col-9"><p class="my-0">'
+            + formatNumberWithCommas(paymentStatusResponse.payment_route.total_fees_msat) +
+            ' mSats</p></div></div><hr><div class="row"><div class="col-3"><p class="my-0">Total hops: </p></div><div class="col-9"><p class="my-0">'
+            + formatNumberWithCommas(paymentStatusResponse.payment_route.hops.length) +
+            '</p></div></div><hr>';
       }
     } else {
-      if (selectNodeImplementation != 'LND') {
-        return '<div class="row px-2"><div class="col-3"><p class="my-0">Error: </p></div><div class="col-9"><p class="my-0">'
+      switch (selectNodeImplementation) {
+        case 'CLN':
+          return '<div class="row px-2"><div class="col-3"><p class="my-0">Error: </p></div><div class="col-9"><p class="my-0">'
           + paymentStatusResponse.message +
           '</p></div></div><hr><div class="row px-2"><div class="col-3"><p class="my-0">Code: </p></div><div class="col-9"><p class="my-0">'
           + paymentStatusResponse.error.code +
           '</p></div></div><hr><div class="row px-2"><div class="col-3"><p class="my-0">Description: </p></div><div class="col-9"><p class="my-0">'
           + paymentStatusResponse.error.message +
           '</p></div></div>';
-      } else {
-        return '<div class="row px-2"><div class="col-3"><p class="my-0">Error: </p></div><div class="col-9"><p class="my-0">'
+        case 'ECL':
+          return '<div class="row px-2"><div class="col-3"><p class="my-0">Error: </p></div><div class="col-9"><p class="my-0">'
+          + paymentStatusResponse.error +
+          '</p></div></div><hr><div class="row px-2"><div class="col-3"><p class="my-0">Description: </p></div><div class="col-9"><p class="my-0">'
+          + paymentStatusResponse.message +
+          '</p></div></div>';
+          break;
+        default:
+          return '<div class="row px-2"><div class="col-3"><p class="my-0">Error: </p></div><div class="col-9"><p class="my-0">'
           + paymentStatusResponse.message +
           '</p></div></div><hr><div class="row px-2"><div class="col-3"><p class="my-0">Code: </p></div><div class="col-9"><p class="my-0">'
           + ((paymentStatusResponse.error.code) ? paymentStatusResponse.error.code : paymentStatusResponse.error) +

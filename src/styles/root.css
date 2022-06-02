@@ -2,7 +2,8 @@ html {
   width: 100%;
   height: 100%;
   line-height: 1.5;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   font-family: 'Roboto', sans-serif;
   font-size: 16px;
 }
@@ -13,20 +14,24 @@ body {
 
 .quick-pay-container {
   width: 550px;
-  height: 650px;
+  height: 615px;
   position: relative;
 }
+
 .page-container {
-display: block;
-padding: 6px 12px;
-height: 100%;
+  display: block;
+  padding: 6px 12px;
+  height: 100%;
 }
+
 .h-100 {
-height: 99.99%;
+  height: 99.99%;
 }
+
 .mr-1px {
-margin-right: 1px;
+  margin-right: 1px;
 }
+
 .pay-status-details {
   padding-top: 0.4rem;
   min-height: 15rem;
@@ -34,45 +39,56 @@ margin-right: 1px;
   overflow-y: auto;
   overflow-x: hidden;
 }
+
 .pay-details {
-padding-top: 0.4rem;
-min-height: 10rem;
-height: 10rem;
-overflow-y: auto;
-overflow-x: hidden;
+  padding-top: 0.4rem;
+  min-height: 10rem;
+  height: 10rem;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
+
 .invalid-border {
-border: 1px solid #c62828 !important;
+  border: 1px solid #c62828 !important;
 }
+
 .btn-header-close {
-cursor: pointer;
-padding: 0 !important;
-min-width: 1rem !important;
+  cursor: pointer;
+  padding: 0 !important;
+  min-width: 1rem !important;
 }
+
 .show-error {
   display: none;
-font-size: 0.8rem;
-color: #c62828;
+  font-size: 0.8rem;
+  color: #c62828;
 }
+
 .show-config-msg {
-display: none;
-font-size: 0.8rem;
-color: #28ca43;
+  display: none;
+  font-size: 0.8rem;
+  color: #28ca43;
 }
-.card-header .header-title, .card-header .btn-header-close {
+
+.card-header .header-title,
+.card-header .btn-header-close {
   font-size: 140%;
   font-weight: 400;
   color: white;
   outline: none;
 }
+
 .header-logo {
-  width: 1.4rem;
-  height: 1.4rem;
+  width: 2rem;
+  height: 2rem;
+  margin-top: -4px;
 }
+
 .invoice-amount {
   padding: 0 0.75rem;
   margin-top: -8px;
 }
+
 .card-body:focus {
   outline: none;
 }

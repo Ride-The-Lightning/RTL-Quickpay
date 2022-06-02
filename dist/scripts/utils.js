@@ -44,3 +44,7 @@ function loadModule(params) {
   newModule.render();
   newModule.initEvents();
 }
+
+function formatNumberWithCommas(n) {
+  return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}

@@ -10,13 +10,18 @@ class CONSTANTS {
     return {
       LND: {
         GET_INFO: '/rtl/api/lnd/getinfo',
-        GET_PAYMENT_DETAILS: '/rtl/api/lnd/payreq',
+        GET_PAYMENT_DETAILS: '/rtl/api/lnd/payments/decode',
         SEND_PAYMENT: '/rtl/api/lnd/channels/transactions'
       },
       CLN: {
         GET_INFO: '/rtl/api/cln/getinfo',
         GET_PAYMENT_DETAILS: '/rtl/api/cln/utility/decode',
         SEND_PAYMENT: '/rtl/api/cln/payments'
+      },
+      ECL: {
+        GET_INFO: '/rtl/api/ecl/getinfo',
+        GET_PAYMENT_DETAILS: '/rtl/api/ecl/payments/decode',
+        SEND_PAYMENT: '/rtl/api/ecl/payments'
       }
     };
   };
@@ -35,6 +40,22 @@ class CONSTANTS {
       ERROR: 'ERROR',
       STATUS: 'STATUS'
     };
+  };
+  static get MONTHS() {
+    return [
+      { name: 'Jan', days: 31 },
+      { name: 'Feb', days: 28 },
+      { name: 'Mar', days: 31 },
+      { name: 'Apr', days: 30 },
+      { name: 'May', days: 31 },
+      { name: 'Jun', days: 30 },
+      { name: 'Jul', days: 31 },
+      { name: 'Aug', days: 31 },
+      { name: 'Sep', days: 30 },
+      { name: 'Oct', days: 31 },
+      { name: 'Nov', days: 30 },
+      { name: 'Dec', days: 31 }
+    ];
   };
 }
 
