@@ -8,8 +8,8 @@ function callServerAPI(method, url, serverToken, requestData) {
     method: method,
     data: requestData,
     success: (data, resStatus, res) => {
-      if (res.getResponseHeader('_csrf')) {
-        csrfToken = res.getResponseHeader('_csrf');
+      if (res.getResponseHeader('XSRF-TOKEN')) {
+        csrfToken = res.getResponseHeader('XSRF-TOKEN');
       }
     },
     error: (error, resStatus, res) => {
