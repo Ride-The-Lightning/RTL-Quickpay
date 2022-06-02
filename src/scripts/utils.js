@@ -4,9 +4,17 @@ function callServerAPI(method, url, serverToken, requestData) {
   return $.ajax({
     cache: false,
     url: url,
-    headers: { 'Authorization': 'Bearer ' + serverToken, 'Content-Type': 'application/json' },
+    headers: { 'Authorization': 'Bearer ' + serverToken, 'Content-Type': 'application/json', 'XSRF-TOKEN': csrfToken },
     method: method,
-    data: requestData
+    data: requestData,
+    success: (data, resStatus, res) => {
+      if (res.getResponseHeader('_csrf')) {
+        csrfToken = res.getResponseHeader('_csrf');
+      }
+    },
+    error: (error, resStatus, res) => {
+      console.error(error);
+    }
   });  
 }
 

@@ -40,6 +40,7 @@ class CONSTANTS {
 
 var RTLServerURL = '';
 var serverToken = '';
+var csrfToken = '';
 var rtlConfig = {};
 var selectNodeImplementation = 'LND';
 var pageContainer = $('#pageContainer');

@@ -79,13 +79,13 @@ Payment.prototype.initEvents = function () {
     });
   });
 
-  $('#selectNodeRadio').change(function(){
+  $('#selectNodeRadio').on('change', function(){
     if (rtlConfig && rtlConfig.nodes.length > 0) {
       $('#paymentDetails').html(CONSTANTS.SPINNER);
       $('#spinnerMessage').text('Fetching Information...')
       $('#invoice').val('');
       $('#paymentDetails').removeClass('invalid-border');
-      var newSelNode = '';
+      var newSelNodeIndex = -1;
       var filteredNode = {};
       var final_url = '';
       if(rtlConfig.nodes.length == 1) {
@@ -108,12 +108,13 @@ Payment.prototype.initEvents = function () {
             loadModule({ load: CONSTANTS.MODULES.ERROR, loadedFrom: CONSTANTS.MODULES.PAYMENT, error: err.responseJSON});
           });
       } else {
-        newSelNode = $("input[name='selectNodeRadioInput']:checked").val();
-        filteredNode = rtlConfig.nodes.filter(node => { return node.index == newSelNode; })[0];
+        newSelNodeIndex = +$("input[name='selectNodeRadioInput']:checked").val();
+        filteredNode = rtlConfig.nodes.filter(node => { return node.index == newSelNodeIndex; })[0];
         selectNodeImplementation = (filteredNode.lnImplementation && filteredNode.lnImplementation != '') ? filteredNode.lnImplementation.toUpperCase() : 'LND';
-        callServerAPI('POST', RTLServerURL + CONSTANTS.UPDATE_SEL_NODE_URL, serverToken, JSON.stringify({ 'selNodeIndex': newSelNode }))
+        callServerAPI('POST', RTLServerURL + CONSTANTS.UPDATE_SEL_NODE_URL, serverToken, JSON.stringify({ 'currNodeIndex': newSelNodeIndex, 'prevNodeIndex': selNode.index }))
         .then(selNodeResponse => {
-          updateStyles(newSelNode);
+          selNode = rtlConfig.nodes.filter(node => node.index == newSelNodeIndex)[0];
+          updateStyles(newSelNodeIndex);
           if (selectNodeImplementation != 'LND') {
             final_url = RTLServerURL + CONSTANTS.API_URL.CLN.GET_INFO;
           } else {

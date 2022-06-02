@@ -12,7 +12,6 @@ $(function () {
       if (storage.RTL_SERVER_URL && storage.RTL_SERVER_URL.trim() != '') {
         callServerAPI('GET', storage.RTL_SERVER_URL.trim(), '')
           .then(csrfTokenCheck => {
-            console.log('CSRF Set');
             callServerAPI('GET', storage.RTL_SERVER_URL.trim() + CONSTANTS.RTL_CONF_URL, '')
               .then(rtlConfigRes => {
                 rtlConfig = rtlConfigRes;
