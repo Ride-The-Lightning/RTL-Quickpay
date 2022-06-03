@@ -16,5 +16,8 @@
     "webpack": "^4.41.5",
     "webpack-cli": "^3.3.10",
     "zip-webpack-plugin": "^3.0.0"
+  },
+  "dependencies": {
+    "webln": "^0.3.0"
   }
 }
