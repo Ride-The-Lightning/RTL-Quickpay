@@ -18,8 +18,8 @@ $(function () {
                 browser.storage.sync.set({ 'SERVER_CONFIG': rtlConfig });
                 if (rtlConfig.nodes) {
                   selNode = rtlConfig.nodes.filter(node => node.index == rtlConfig.selectedNodeIndex)[0];
-                  if (selNode.settings && selNode.settings.themeMode && selNode.settings.themeColor) {
-                    $('link[id="themeStyle"]').attr('href', './styles/' + selNode.settings.themeMode + '/' + selNode.settings.themeColor + '.css');
+                  if(selNode && selNode.settings && selNode.settings.themeMode && selNode.settings.themeColor) {
+                    $('link[id="themeStyle"]').attr('href', './styles/' + selNode.settings.themeMode.toLowerCase() + '/' + selNode.settings.themeColor.toLowerCase() + '.css');
                   }
                 }
               })
