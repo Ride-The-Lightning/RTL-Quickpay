@@ -27,7 +27,8 @@
     }
   ], 
   "permissions": [
-    "<all_urls>",
+    "http://*/*",
+    "https://*/*",
     "storage",
     "activeTab",
     "contextMenus"

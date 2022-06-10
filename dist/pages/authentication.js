@@ -75,7 +75,7 @@ Authentication.prototype.initEvents = function () {
     });
   });
 
-  $('#password').keyup(function () {
+  $('#password').on('keyup', function () {
     event.preventDefault();
     if (!event.altKey && !event.ctrlKey && event.code != 'Tab' && $('#password').val().trim() != '') {
       $('#authBtn').removeAttr('disabled');
@@ -85,7 +85,7 @@ Authentication.prototype.initEvents = function () {
     }
   });
 
-  $('#authBtn').click(function () {
+  $('#authBtn').on('click', function () {
     $('#authBtn').html(CONSTANTS.SPINNER_BTN);
     $('#spinnerBtnMsg').text('Logging in...');
     var shaObj = new jsSHA("SHA-256", "TEXT");
