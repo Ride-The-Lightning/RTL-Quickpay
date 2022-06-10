@@ -6,7 +6,7 @@ Browsers Supported:
 * Firefox
 
 ### Prerequisites
-[RTL](https://github.com/ShahanaFarooqui/RTL) running on your local network and connected to LND or C-lightning node.
+[RTL](https://github.com/ShahanaFarooqui/RTL) running on your local network and connected to LND/Core-lightning/Eclair node.
 
 ### Install
 * Chrome Webstore [link](https://chrome.google.com/webstore/detail/rtl-quick-pay/bnlpaipkkgfdojfdlmakgjngbiepghof)
