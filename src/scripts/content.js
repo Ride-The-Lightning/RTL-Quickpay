@@ -56,6 +56,67 @@ if (document) {
         type,
         origin,
       };
+
+      Promise.resolve()
+      .then(() => {
+        if (ev.data.getBlocked) {
+          // return blocked status for this site
+          if (_blocked !== null) return _blocked // cached
+
+          // it's always blocked if the user has no options
+          return rpcParamsAreSet().then(ok => {
+            if (!ok) throw new Error('Lightning RPC params are not set.')
+
+            return browser.runtime
+              .sendMessage({
+                getBlocked: true,
+                domain: origin.domain
+              })
+              .then(blocked => {
+                _blocked = blocked
+                return blocked
+              })
+          })
+        } else {
+          // default: an action or prompt
+          console.log(`[kWh]: ${type} ${structuredprint(extra)} ${structuredprint(origin)}`)
+
+          switch (type) {
+            case REQUEST_GETINFO:
+              return browser.runtime.sendMessage({
+                rpc: {getInfo: []}
+              })
+            default:
+              return null
+          }
+        }
+      })
+      .then(earlyResponse => {
+        if (earlyResponse !== null && earlyResponse !== undefined) {
+          // we have a response already. end here.
+          return earlyResponse
+        } else {
+          // proceed to call the background page
+          // and prompt the user if necessary
+          return browser.runtime.sendMessage({setAction: action})
+        }
+      })
+      .then(response => {
+        window.postMessage(
+          {response: true, application: 'kWh', data: response},
+          '*'
+        )
+      })
+      .catch(err => {
+        window.postMessage(
+          {
+            response: true,
+            application: 'kWh',
+            error: err ? err.message || err : err
+          },
+          '*'
+        )
+      })
     });
   });
 }
