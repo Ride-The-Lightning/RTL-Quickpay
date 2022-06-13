@@ -1,6 +1,8 @@
 if (document) {
-  document.addEventListener('DOMContentLoaded', () => {
-    document.body.addEventListener('click', event => {
+  var browser = require("../shared/browser-polyfill");
+
+  document.addEventListener("DOMContentLoaded", () => {
+    document.body.addEventListener("click", (event) => {
       const target = event.target;
       if (!target || !target.closest) { return; }
       const paymentURL = target.closest('[href^="lightning:"]');

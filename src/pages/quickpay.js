@@ -19,7 +19,7 @@ $(function () {
                 if (rtlConfig.nodes) {
                   selNode = rtlConfig.nodes.filter(node => node.index == rtlConfig.selectedNodeIndex)[0];
                   if(selNode && selNode.settings && selNode.settings.themeMode && selNode.settings.themeColor) {
-                    $('link[id="themeStyle"]').attr('href', './styles/' + selNode.settings.themeMode.toLowerCase() + '/' + selNode.settings.themeColor.toLowerCase() + '.css');
+                    $('link[id="themeStyle"]').attr('href', '../assets/themes/' + selNode.settings.themeMode.toLowerCase() + '/' + selNode.settings.themeColor.toLowerCase() + '.css');
                   }
                 }
               })
