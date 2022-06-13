@@ -9,31 +9,18 @@ module.exports = {
   name: 'rtl-quickpay',
   entry: {
     background: path.join(__dirname, 'src/scripts/background.js'),
-    content: path.join(__dirname, 'src/scripts/content.js')
+    content: path.join(__dirname, 'src/scripts/content.js'),
   },
   output: {
     path: path.join(__dirname, 'dist'),
     filename: './scripts/[name].js',
     publicPath: '/'
   },
-  resolve: {
-    extensions: ['.ts', '.js', '.json'],
-    modules: [path.join(__dirname, 'src'), 'node_modules'],
-    alias: {
-      assets: path.join(__dirname, 'src/assets'),
-      pages: path.join(__dirname, 'src/pages'),
-      scripts: path.join(__dirname, 'src/scripts'),
-      shared: path.join(__dirname, 'src/shared'),
-      styles: path.join(__dirname, 'src/styles'),
-      browser: path.join(__dirname, 'node_modules/webextension-polyfill/dist/browser-polyfill.js')
-    },
-  },
   plugins: [
-    // new webpack.ProvidePlugin({
-    //   $: path.resolve(path.join(__dirname, 'node_modules/jquery/dist/jquery.min.js')),
-    //   sha256: path.resolve(path.join(__dirname, 'node_modules/jssha/dist/sha256.js')),
-    //   'browser-polyfill': path.resolve(path.join(__dirname, 'node_modules/webextension-polyfill/dist/browser-polyfill.min.js'))
-    // }),
+    new webpack.ProvidePlugin({
+      $: 'jquery',
+      jquery: 'jquery',
+    }),
     new CopyWebpackPlugin({ patterns: [
       { from: './src/manifest.json' },
       { from: './src/index.html' },
@@ -48,6 +35,6 @@ module.exports = {
     new ZipPlugin({
       path: path.join(__dirname, '/package'),
       filename: `RTL-Quickpay-v${packageJson.version}.zip`
-    }),
+    })
   ]
 };

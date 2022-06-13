@@ -1,5 +1,5 @@
 var payReqForContext = '';
-var browser = require("../shared/browser-polyfill");
+var browser = require('../shared/browser-polyfill');
 
 browser.runtime.onMessage.addListener((msg, sender) => {
   if (msg.data && msg.source === 'CLICK' && msg.application === 'RTL') {
