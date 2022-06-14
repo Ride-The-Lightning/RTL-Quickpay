@@ -79,7 +79,7 @@ if (document) {
           })
         } else {
           // default: an action or prompt
-          console.log(`[kWh]: ${type} ${structuredprint(extra)} ${structuredprint(origin)}`)
+          console.log(`[RTL]: ${type} ${structuredprint(extra)} ${structuredprint(origin)}`)
 
           switch (type) {
             case REQUEST_GETINFO:
@@ -103,7 +103,7 @@ if (document) {
       })
       .then(response => {
         window.postMessage(
-          {response: true, application: 'kWh', data: response},
+          {response: true, application: 'RTL', data: response},
           '*'
         )
       })
@@ -111,7 +111,7 @@ if (document) {
         window.postMessage(
           {
             response: true,
-            application: 'kWh',
+            application: 'RTL',
             error: err ? err.message || err : err
           },
           '*'
