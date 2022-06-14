@@ -5,16 +5,15 @@
   "version": "0.0.6",
   "author": "Shahana",
   "icons": {
-    "128": "./images/Logo128.png",
-    "48": "./images/Logo48.png",
-    "16": "./images/Logo16.png"
-  }, 
+    "128": "./assets/images/Logo128.png",
+    "48": "./assets/images/Logo48.png",
+    "16": "./assets/images/Logo16.png"
+  },
   "background": {
-    "persistent": true,
-    "scripts": ["./scripts/browser-polyfill.js", "./scripts/background.js"]
-  },   
+    "scripts": ["./scripts/background.js"]
+  },
   "browser_action": {
-    "default_icon": "./images/Logo16.png",
+    "default_icon": "./assets/images/Logo16.png",
     "default_title": "RTL Quickpay",
     "default_popup": "./index.html"
   },  
@@ -24,22 +23,16 @@
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["./scripts/browser-polyfill.js", "./scripts/content.js"],
+      "js": ["./scripts/content.js"],
       "run_at": "document_start",
       "all_frames": true
     }
-  ], 
+  ],
   "permissions": [
     "http://*/*",
     "https://*/*",
     "storage",
     "activeTab",
     "contextMenus"
-  ],
-  "applications": {
-    "gecko": {
-      "id": "shahana.farooqui@rtl.com",
-      "strict_min_version": "57.0"
-    }
-  }
+  ]
 }

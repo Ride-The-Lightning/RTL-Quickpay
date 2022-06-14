@@ -1,4 +1,7 @@
 if (document) {
+
+  var browser = require('../shared/browser-polyfill');
+  
   document.addEventListener("DOMContentLoaded", () => {
     document.body.addEventListener("click", (event) => {
       const target = event.target;
