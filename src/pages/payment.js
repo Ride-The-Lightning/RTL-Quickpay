@@ -215,8 +215,11 @@ Payment.prototype.initEvents = function () {
           $('#sendPaymentBtn').removeAttr('disabled');
         }
       }).catch(err => {
+        $("#paymentDetails").html(`<div class="alert alert-danger" role="alert">
+    <strong><h6 id="errorTitle">Invalid ID</h6></strong>
+    <span id="errorMsg">Please Enter Correct Invoice ID.</span>
+  </div>`);
         $('#paymentDetails').html(createPaymentDetailsHTML('ERROR', selectNodeImplementation, err.responseJSON));
-        $('#paymentDetails').addClass('invalid-border');
         $('#sendPaymentBtn').attr('disabled', true);
       });
     }
