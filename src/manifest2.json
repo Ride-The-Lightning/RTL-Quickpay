@@ -1,5 +1,5 @@
 {
-  "manifest_version": 3,
+  "manifest_version": 2,
   "name": "RTL Quickpay",
   "description": "RTL Quick Lightning payments.",
   "version": "0.0.6",
@@ -10,16 +10,13 @@
     "16": "./assets/images/Logo16.png"
   },
   "background": {
-    "service_worker": "./scripts/background.js"
+    "scripts": ["./scripts/background.js"]
   },
-  "action": {
+  "browser_action": {
     "default_icon": "./assets/images/Logo16.png",
     "default_title": "RTL Quickpay",
     "default_popup": "./index.html"
   },  
-  "web_accessible_resources": [
-    "webln-bundle.js"
-  ],
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
@@ -28,8 +25,9 @@
       "all_frames": true
     }
   ],
-  "host_permissions": ["http://*/*", "https://*/*"],
   "permissions": [
+    "http://*/*",
+    "https://*/*",
     "storage",
     "activeTab",
     "contextMenus"
