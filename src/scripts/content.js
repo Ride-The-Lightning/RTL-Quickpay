@@ -1,5 +1,5 @@
 if (document) {
-  var browser = require('../shared/browser-polyfill');
+  var browser = require('webextension-polyfill');
   
   document.addEventListener("DOMContentLoaded", () => {
     document.body.addEventListener("click", (event) => {
