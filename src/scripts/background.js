@@ -1,6 +1,8 @@
 var payReqForContext = '';
 var browser = require('webextension-polyfill');
 
+
+// this is to open a dialog box with address, with the action of a left click
 browser.runtime.onMessage.addListener((msg, sender) => {
   if (msg.data && msg.source === 'CLICK' && msg.application === 'RTL') {
     browser.windows.create({

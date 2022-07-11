@@ -11,9 +11,29 @@ class WebLNProvider {   // Connect to the web browser
             return result;
           });
     }
-}
 
-// getInfo 
+    getInfo() {
+      return this.enable()
+        .then(() => this._prompt(REQUEST_GETINFO))
+        .then(info => ({
+          node: {
+            alias: info.alias,
+            pubkey: info.id,
+            color: info.color
+          }
+        }))
+    }
+
+    sendPayment(invoice) {
+      return this.enable()
+        .then(() => this._prompt(PROMPT_PAYMENT, {invoice}))
+        .then(preimage => ({preimage}))
+    }
+
+    _prompt(type, params) {
+      return this._sendMessage({type, ...params})
+    }
+}
 
 // getTransactions
 

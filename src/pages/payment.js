@@ -47,7 +47,7 @@ Payment.prototype.initEvents = function () {
   }
 
   $('#sendPaymentBtn').click(function () {
-    $('#sendPaymentBtn').html(CONSTANTS.SPINNER_BTN);
+    $('#sendPaymentBtn').html(CONSTANTS.SPINNER_BTN); 
     let reqData = {};
     let invoiceVal = $('#invoice').val();
     let invoiceAmount = $('#invoiceAmount').val();
