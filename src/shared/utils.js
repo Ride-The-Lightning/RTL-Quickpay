@@ -48,3 +48,13 @@ function loadModule(params) {
 function formatNumberWithCommas(n) {
   return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
+
+const defaultRpcParams = {
+  kind: 'lightningd',
+  endpoint: 'http://localhost:3000/',
+  serverToken: '',
+}
+
+export function getRpcParams() {
+  return browser.storage.local.get(defaultRpcParams)
+}

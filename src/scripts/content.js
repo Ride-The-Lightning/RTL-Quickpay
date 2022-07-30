@@ -46,7 +46,7 @@ if (document) {
     window.addEventListener("message", (event) => {
       // only accept messages from the current window
       if (event.source !== window) return;
-      if (!event.data || ev.data.application !== "RTL" || event.data.response)
+      if (!event.data || event.data.application !== "RTL" || event.data.response)
         return;
 
       let origin = getOriginData();
@@ -60,7 +60,7 @@ if (document) {
 
       Promise.resolve()
       .then(() => {
-        if (ev.data.getBlocked) {
+        if (event.data.getBlocked) {
           // return blocked status for this site
           if (_blocked !== null) return _blocked // cached
 
@@ -93,12 +93,11 @@ if (document) {
         }
       })
       .then(earlyResponse => {
-        if (earlyResponse !== null && earlyResponse !== undefined) {
+        if (earlyResponse !== undefined && earlyResponse !== null) {
           // we have a response already. end here.
           return earlyResponse
         } else {
-          // proceed to call the background page
-          // and prompt the user if necessary
+          // proceed to call the background page and prompt the user if necessary
           return browser.runtime.sendMessage({setAction: action})
         }
       })

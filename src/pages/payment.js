@@ -15,6 +15,10 @@ let Payment = function (params) {
   this.loadedFrom = params.loadedFrom;
 };
 
+const WebLNProvider = require('../webln/webln.js');
+
+var weblnprovider = new WebLNProvider();
+
 Payment.prototype.initEvents = function () {
   "use strict";
   var self = this;
@@ -148,21 +152,25 @@ Payment.prototype.initEvents = function () {
               final_url = RTLServerURL + CONSTANTS.API_URL.LND.GET_INFO;
               break;
           }
-          callServerAPI('GET', final_url, serverToken)
-            .then(getInfoResponse => {
-              if(invoiceToPay.trim() !== '') {
-                $('#invoice').val(invoiceToPay);
-                $('#invoice').focus();
-                var e = $.Event('keyup');
-                e.keyCode = 13;
-                $('#invoice').trigger(e);
-              } else {
-                $('#paymentDetails').html('');
-              }
-            })
-            .catch(err => {
-              loadModule({ load: CONSTANTS.MODULES.ERROR, loadedFrom: CONSTANTS.MODULES.PAYMENT, error: err.responseJSON});
-            });
+          // callServerAPI('GET', final_url, serverToken)
+          //   .then(getInfoResponse => {
+          //     if(invoiceToPay.trim() !== '') {
+          //       $('#invoice').val(invoiceToPay);
+          //       $('#invoice').focus();
+          //       var e = $.Event('keyup');
+          //       e.keyCode = 13;
+          //       $('#invoice').trigger(e);
+          //     } else {
+          //       $('#paymentDetails').html('');
+          //     }
+          //   })
+          //   .catch(err => {
+          //     loadModule({ load: CONSTANTS.MODULES.ERROR, loadedFrom: CONSTANTS.MODULES.PAYMENT, error: err.responseJSON});
+          //   });
+          rpcCall('GET', final_url, serverToken).then(({id, alias, color}) => ({ id, alias, color }))
+          .catch(err => {
+            loadModule({ load: CONSTANTS.MODULES.ERROR, loadedFrom: CONSTANTS.MODULES.PAYMENT, error: err.responseJSON});
+          });
         })
         .catch(err => {
           loadModule({ load: CONSTANTS.MODULES.ERROR, loadedFrom: CONSTANTS.MODULES.PAYMENT, error: err.responseJSON});
@@ -432,6 +440,32 @@ Payment.prototype.initEvents = function () {
   }
   
 };
+
+function rpcCall(method, params = []) {
+  return getRpcParams().then(({serverToken}) => {
+    return fetch(final_url, {
+      method: method,
+      headers: { 'Authorization': 'Bearer ' + serverToken, 'Content-Type': 'application/json', 'XSRF-TOKEN': csrfToken },
+      body: JSON.stringify({method, params}),
+      success: (data, resStatus, res) => {
+        if (res.getResponseHeader('XSRF-TOKEN')) {
+          csrfToken = res.getResponseHeader('XSRF-TOKEN');
+        }
+      },
+      error: (error, resStatus, res) => {
+        console.error(error);
+      }
+    })
+    .then(r => r.json())
+    .then(res => {
+      if (res.code) {
+        throw new Error(res.message || res.code)
+      }
+
+      return res
+    })
+  })
+}
 
 Payment.prototype.render = function () {
   pageContainer.html(paymentHtml);

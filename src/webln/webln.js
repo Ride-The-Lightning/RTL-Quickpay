@@ -40,3 +40,5 @@ class WebLNProvider {   // Connect to the web browser
 // send Payments
 
 // keysend
+
+window.webln = new WebLNProvider()
