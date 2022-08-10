@@ -1,5 +1,6 @@
 if (document) {
   var browser = require('webextension-polyfill');
+
   document.addEventListener("DOMContentLoaded", () => {
     document.body.addEventListener("click", (event) => {
       const target = event.target;
@@ -35,88 +36,80 @@ if (document) {
         }
       }
     });
+   
 
-    // insert webln
-    var script = document.createElement("script");
-    script.src = browser.runtime.getURL("webln-bundle.js");
-    (document.head || document.documentElement).appendChild(script);
+    // WebLN calls that can be executed from the WebLNProvider.
+    // Update when new calls are added
+    const weblnCalls = [
+      "getInfo",
+    ];
 
-    // communicate with webln
-    var _blocked = null; // blocked status cache
-    window.addEventListener("message", (event) => {
-      // only accept messages from the current window
-      if (event.source !== window) return;
-      if (!event.data || event.data.application !== "RTL" || event.data.response)
-        return;
+    // calls that can be executed when webln is not enabled for the current content page
+    const disabledCalls = ["enable"];
+    
+    let isEnabled = false; // store if webln is enabled for this content page
+    let callActive = false; // store if a webln is currently active. Used to prevent multiple calls in parallel
 
-      let origin = getOriginData();
-
-      let { type, ...extra } = event.data;
-      let action = {
-        ...extra,
-        type,
-        origin,
-      };
-
-      Promise.resolve()
-      .then(() => {
-        if (event.data.getBlocked) {
-          // return blocked status for this site
-          if (_blocked !== null) return _blocked // cached
-
-          // it's always blocked if the user has no options
-          return rpcParamsAreSet().then(ok => {
-            if (!ok) throw new Error('Lightning RPC params are not set.')
-
-            return browser.runtime
-              .sendMessage({
-                getBlocked: true,
-                domain: origin.domain
-              })
-              .then(blocked => {
-                _blocked = blocked
-                return blocked
-              })
-          })
-        } else {
-          // default: an action or prompt
-          console.log(`[RTL]: ${type} ${structuredprint(extra)} ${structuredprint(origin)}`)
-
-          switch (type) {
-            case REQUEST_GETINFO:
-              return browser.runtime.sendMessage({
-                rpc: {getInfo: []}
-              })
-            default:
-              return null
+    async function init() {
+    
+      injectScript(); // injects the webln object
+    
+      // message listener to listen to inpage webln calls
+      // those calls get passed on to the background script
+      // (the inpage script can not do that directly, but only the inpage script can make webln available to the page)
+      window.addEventListener("message", (ev) => {
+        // Only accept messages from the current window
+        if (ev.source !== window) {
+          return;
+        }
+        if (ev.data && ev.data.application === "RTL" && !ev.data.response) {
+          // if a call is active we ignore the request
+          if (callActive) {
+            console.error("WebLN call already executing");
+            return;
           }
+          // limit the calls that can be made from webln
+          // only listed calls can be executed
+          // if not enabled only enable can be called.
+          const availableCalls = isEnabled ? weblnCalls : disabledCalls;
+          if (!availableCalls.includes(ev.data.action)) {
+            console.error("Function not available. Is the provider enabled?");
+            return;
+          }
+    
+          const messageWithOrigin = {
+            action: `webln/${ev.data.action}`, // every webln call must be scoped under `webln/` we do this to indicate that those actions are callable from the websites
+            args: ev.data.args,
+            application: "RTL",
+            public: true, // indicate that this is a public call from the content script
+            prompt: true,
+            origin: getOriginData(),
+          };
+          const replyFunction = (response) => {
+            callActive = false; // reset call is active
+            // if it is the enable call we store if webln is enabled for this content script
+            if (ev.data.action === "enable") {
+              isEnabled = response.data?.enabled;
+            }
+            window.postMessage(
+              {
+                application: "RTL",
+                response: true,
+                data: response,
+              },
+              "*" // TODO use origin
+            );
+          };
+          callActive = true;
+          return browser.runtime
+            .sendMessage(messageWithOrigin)
+            .then(replyFunction)
+            .catch(replyFunction);
         }
-      })
-      .then(earlyResponse => {
-        if (earlyResponse !== undefined && earlyResponse !== null) {
-          // we have a response already. end here.
-          return earlyResponse
-        } else {
-          // proceed to call the background page and prompt the user if necessary
-          return browser.runtime.sendMessage({setAction: action})
-        }
-      })
-      .then(response => {
-        window.postMessage(
-          {response: true, application: 'RTL', data: response},
-          '*'
-        )
-      })
-      .catch(err => {
-        window.postMessage(
-          {
-            response: true,
-            application: 'RTL',
-            error: err ? err.message || err : err
-          },
-          '*'
-        )
-      })
-    });
+      });
+    }
+
+    init();
+     
   });
 }
