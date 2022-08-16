@@ -6,7 +6,7 @@ class Cln{
       }
     
     unload() {
-    return Promise.resolve();
+        return Promise.resolve();
     }
 
     getInfo() {

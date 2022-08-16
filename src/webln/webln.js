@@ -40,7 +40,7 @@ export default class WebLNProvider {
               // there are some other events happening
               if (!messageEvent.data ||
                   !messageEvent.data.response ||
-                  messageEvent.data.application !== "LBE") {
+                  messageEvent.data.application !== "RTL") {
                   return;
               }
               if (messageEvent.data.data.error) {
