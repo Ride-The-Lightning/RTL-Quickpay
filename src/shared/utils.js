@@ -85,12 +85,42 @@ function formatNumberWithCommas(n) {
   return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
-const defaultRpcParams = {
-  kind: 'lightningd',
-  endpoint: 'http://localhost:3000/',
-  serverToken: '',
-}
-
-export function getRpcParams() {
-  return browser.storage.local.get(defaultRpcParams)
-}
+const utils = {
+  call: (action, args, overwrites) => {
+      return browser.runtime
+          .sendMessage(Object.assign({ application: "RTL", prompt: true, action: action, args: args, origin: { internal: true } }, overwrites))
+          .then((response) => {
+          if (response.error) {
+              toast.error(response.error);
+              throw new Error(response.error);
+          }
+          return response.data;
+      });
+  },
+  notify: (options) => {
+      const notification = Object.assign({ type: "basic", iconUrl: "assets/icons/alby_icon_yellow_48x48.png" }, options);
+      return browser.notifications.create(notification);
+  },
+  base64ToHex: (str) => {
+      const hex = [];
+      for (let i = 0, bin = atob(str.replace(/[ \r\n]+$/, "")); i < bin.length; ++i) {
+          let tmp = bin.charCodeAt(i).toString(16);
+          if (tmp.length === 1)
+              tmp = "0" + tmp;
+          hex[hex.length] = tmp;
+      }
+      return hex.join("");
+  },
+  publishPaymentNotification: (message, data) => {
+      let status = "success"; 
+      if ("error" in data.response) {
+          status = "failed";
+      }
+      PubSub.publish(`ln.sendPayment.${status}`, {
+          response: data.response,
+          details: data.details,
+          paymentRequestDetails: data.paymentRequestDetails,
+          origin: message.origin,
+      });
+  },
+};
