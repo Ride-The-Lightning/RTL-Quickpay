@@ -1,5 +1,23 @@
 "use strict";
 
+function callServerAPI(method, url, serverToken, requestData) {
+  return $.ajax({
+    cache: false,
+    url: url,
+    headers: { 'Authorization': 'Bearer ' + serverToken, 'Content-Type': 'application/json', 'XSRF-TOKEN': csrfToken },
+    method: method,
+    data: requestData,
+    success: (data, resStatus, res) => {
+      if (res.getResponseHeader('XSRF-TOKEN')) {
+        csrfToken = res.getResponseHeader('XSRF-TOKEN');
+      }
+    },
+    error: (error, resStatus, res) => {
+      console.error(error);
+    }
+  });  
+}
+
 function getOriginData() {
   return {
     domain: getDomain(),
@@ -97,10 +115,6 @@ const utils = {
           return response.data;
       });
   },
-  notify: (options) => {
-      const notification = Object.assign({ type: "basic", iconUrl: "assets/icons/alby_icon_yellow_48x48.png" }, options);
-      return browser.notifications.create(notification);
-  },
   base64ToHex: (str) => {
       const hex = [];
       for (let i = 0, bin = atob(str.replace(/[ \r\n]+$/, "")); i < bin.length; ++i) {
@@ -110,17 +124,5 @@ const utils = {
           hex[hex.length] = tmp;
       }
       return hex.join("");
-  },
-  publishPaymentNotification: (message, data) => {
-      let status = "success"; 
-      if ("error" in data.response) {
-          status = "failed";
-      }
-      PubSub.publish(`ln.sendPayment.${status}`, {
-          response: data.response,
-          details: data.details,
-          paymentRequestDetails: data.paymentRequestDetails,
-          origin: message.origin,
-      });
   },
 };
