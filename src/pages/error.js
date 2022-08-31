@@ -22,29 +22,28 @@ Error.prototype.initEvents = function () {
 
   function onPageLoad() {
     if (self.errorData) {
-      if(self.errorData.error) {
-        if (typeof self.errorData.error != 'string') {
+      if (self.errorData.error) {
+        if (typeof self.errorData.error != "string") {
           self.errorData.error = JSON.stringify(self.errorData.error, null, 2);
         }
-        $('#errorMsg').text(self.errorData.error);
+        $("#errorMsg").text(self.errorData.error);
       }
-      if(self.errorData.message) {
-        $('#errorTitle').text(self.errorData.message);
+      if (self.errorData.message) {
+        $("#errorTitle").text(self.errorData.message);
       }
     }
   }
 
-  pageContainer.keyup(function(event) {
+  pageContainer.keyup(function (event) {
     event.preventDefault();
-    if(event.code == 'Enter') {
-      $('#backBtn').click();
+    if (event.code == "Enter") {
+      $("#backBtn").click();
     }
   });
 
-  $('#backBtn').click(function () {
+  $("#backBtn").click(function () {
     loadModule({ load: self.loadedFrom, loadedFrom: CONSTANTS.MODULES.ERROR });
   });
-
 };
 
 Error.prototype.render = function () {

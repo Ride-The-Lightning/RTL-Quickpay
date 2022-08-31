@@ -15,6 +15,10 @@ let Payment = function (params) {
   this.loadedFrom = params.loadedFrom;
 };
 
+const WebLNProvider = require('../webln/webln.js');
+
+var weblnprovider = new WebLNProvider();
+
 Payment.prototype.initEvents = function () {
   "use strict";
   var self = this;
@@ -47,7 +51,7 @@ Payment.prototype.initEvents = function () {
   }
 
   $('#sendPaymentBtn').click(function () {
-    $('#sendPaymentBtn').html(CONSTANTS.SPINNER_BTN);
+    $('#sendPaymentBtn').html(CONSTANTS.SPINNER_BTN); 
     let reqData = {};
     let invoiceVal = $('#invoice').val();
     let invoiceAmount = $('#invoiceAmount').val();
@@ -215,8 +219,11 @@ Payment.prototype.initEvents = function () {
           $('#sendPaymentBtn').removeAttr('disabled');
         }
       }).catch(err => {
+        $("#paymentDetails").html(`<div class="alert alert-danger" role="alert">
+    <strong><h6 id="errorTitle">Invalid ID</h6></strong>
+    <span id="errorMsg">Please Enter Correct Invoice ID.</span>
+  </div>`);
         $('#paymentDetails').html(createPaymentDetailsHTML('ERROR', selectNodeImplementation, err.responseJSON));
-        $('#paymentDetails').addClass('invalid-border');
         $('#sendPaymentBtn').attr('disabled', true);
       });
     }

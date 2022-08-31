@@ -67,3 +67,4 @@ var selectNodeImplementation = 'LND';
 var pageContainer = $('#pageContainer');
 var invoiceToPay = '';
 var openingSource = CONSTANTS.OPENED_FROM_SOURCE.EXTENSION;
+var REQUEST_GETINFO = 'REQUEST_GETINFO';
