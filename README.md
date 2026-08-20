@@ -1,16 +1,36 @@
+# ⚠️ Deprecated — this project is no longer maintained
+
+RTL-Quickpay was a browser extension for making quick lightning payments via
+[RTL](https://github.com/Ride-The-Lightning/RTL) running on your local network.
+It has been unmaintained since 2022 and this repository is now **archived**.
+
+**Do not install the old store builds.** The extension is built on Manifest V2,
+which modern Chrome can no longer load, and the published packages date from
+2020. An extension this old that handles your node's RTL password should not be
+trusted with a live node.
+
+### Alternatives
+
+* [RTL](https://github.com/Ride-The-Lightning/RTL) itself remains actively
+  maintained and is the recommended way to manage and pay from your LND,
+  Core Lightning, or Eclair node.
+* For paying lightning invoices directly from the browser, use a
+  [WebLN](https://webln.dev)-compatible extension such as
+  [Alby](https://getalby.com), which can connect to your own node.
+
+The code below is preserved for reference only.
+
+---
+
 ## RTL-Quickpay
-RTL-Quickpay is a browser extension, to make lightning payments quickly via [RTL](https://github.com/ShahanaFarooqui/RTL) running on your *local network*.
+RTL-Quickpay is a browser extension, to make lightning payments quickly via [RTL](https://github.com/Ride-The-Lightning/RTL) running on your *local network*.
 
 Browsers Supported:
 * Chrome
 * Firefox
 
 ### Prerequisites
-[RTL](https://github.com/ShahanaFarooqui/RTL) running on your local network and connected to LND or C-lightning node.
-
-### Install
-* Chrome Webstore [link](https://chrome.google.com/webstore/detail/rtl-quick-pay/bnlpaipkkgfdojfdlmakgjngbiepghof)
-* Firefox Add-ons [link](https://addons.mozilla.org/en-US/firefox/addon/rtl-quickpay)
+[RTL](https://github.com/Ride-The-Lightning/RTL) running on your local network and connected to LND or C-lightning node.
 
 ### Configure
 To use RTL-Quickpay, just enter the RTL server URL on the extension and the password configured for RTL.
